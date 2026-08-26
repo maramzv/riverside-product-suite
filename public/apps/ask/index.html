@@ -1894,13 +1894,14 @@ CRITICAL: When a customer asks to hold, reserve, or pre-order a book (especially
           {/* Main Content */}
           <div className="flex-1 flex flex-col w-full bg-bg">
 
-          <header className="bg-primary text-bg px-4 py-3.5 flex flex-col sm:flex-row items-center justify-between border-b border-primary-dark shadow-md gap-3">
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="bg-bg rounded-lg p-1">
-                <img src="/brand/ask/header-wordmark.png" alt="Ask Riverside — Find &amp; Connect" className="h-10 object-contain" />
+          <header className="bg-white text-text px-8 py-3.5 h-[130px] flex flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <img src="/brand/ask/mark.png" alt="" className="h-[84px] object-contain" />
+              <div className="flex flex-col">
+                <span className="font-serif font-bold text-3xl leading-none tracking-wide text-primary">ASK RIVERSIDE</span>
+                <span className="text-xs tracking-widest uppercase text-sky mt-1">Find &amp; Connect</span>
               </div>
               <div>
-                <h1 className="font-serif text-xl font-bold tracking-wide text-bg">Riverside Books</h1>
                 <p className="text-xs text-accent flex items-center gap-1.5 font-medium">
                   <span className="w-2 h-2 rounded-full bg-teal inline-block animate-pulse"></span>
                   Customer Support Chatbot • Open Today 'til 8 PM
@@ -1908,7 +1909,7 @@ CRITICAL: When a customer asks to hold, reserve, or pre-order a book (especially
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end flex-wrap">
+            <div className="flex items-center gap-2.5 justify-end flex-nowrap shrink-0">
               <div className="bg-primary-dark/80 p-1 rounded-xl flex items-center border border-accent/20 text-xs">
                 <button
                   onClick={() => setQueryMode('gemini_flash')}

@@ -27,20 +27,48 @@ body {
 }
 
 .site-header {
-  padding: 1.25rem 2rem;
+  height: 130px;
+  padding: 0 32px;
   border-bottom: 1px solid var(--border);
-  background: var(--paper);
+  background: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  flex-wrap: wrap;
 }
 
-.site-header-logo {
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.site-brand-icon {
   display: block;
-  height: 140px;
+  height: 84px;
   width: auto;
+}
+
+.site-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-brand-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--forest);
+}
+
+.site-brand-tagline {
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--link);
+  margin-top: 4px;
 }
 
 .site-nav {
