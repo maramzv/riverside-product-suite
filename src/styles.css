@@ -5,7 +5,7 @@
   --rb-text:         #2C2C2C;
   --rb-botanical:    #7A8B79;
   --rb-teal:         #2D6A6F;
-  --rb-accent:       #3E7CB1;
+  --rb-accent:       #2A5C8A;
   --rb-accent-light: #C4DDF0;
   --rb-border:       #E7E2D8;
   --rb-border-dark:  rgba(251,249,245,0.18);
@@ -67,7 +67,7 @@ body {
 }
 
 .rb-rail__body {
-  padding: 24px 16px;
+  padding: 44px 16px 24px;
   display: flex;
   flex-direction: column;
   gap: 26px;
@@ -109,16 +109,16 @@ body {
 .rb-navitem__name {
   font-family: var(--rb-font-display);
   font-weight: 600;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--rb-canvas);
   white-space: nowrap;
 }
 .rb-navitem__sub {
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--rb-accent-light);
-  margin-top: 2px;
+  margin-top: 5px;
   white-space: nowrap;
 }
 
