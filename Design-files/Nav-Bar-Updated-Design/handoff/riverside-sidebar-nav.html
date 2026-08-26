@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riverside Books — Sidebar Navigation (N10 Cream Cap)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rb-primary:      #1B3B2B;  /* forest green — rail, headings */
+    --rb-canvas:       #FBF9F5;  /* warm off-white — cream cap, app bg */
+    --rb-surface:      #FFFFFF;  /* cards */
+    --rb-text:         #2C2C2C;  /* body copy */
+    --rb-botanical:    #7A8B79;  /* sage — muted labels on light */
+    --rb-teal:         #2D6A6F;  /* secondary actions */
+    --rb-accent:       #3E7CB1;  /* sky blue — links, subtitles */
+    --rb-accent-light: #8FB4D6;  /* sky blue, reversed on dark */
+    --rb-border:       #E7E2D8;  /* hairline on light */
+    --rb-border-dark:  rgba(251,249,245,0.18); /* hairline on forest */
+    --rb-label-dark:   rgba(251,249,245,0.68); /* group label on forest */
+    --rb-active-dark:  rgba(251,249,245,0.10); /* active row on forest */
+
+    --rb-rail-width: 264px;
+    --rb-radius-row: 10px;
+    --rb-font-display: 'Playfair Display', Georgia, serif;
+    --rb-font-body: 'Lora', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--rb-font-body);
+    color: var(--rb-text);
+    background: var(--rb-canvas);
+  }
+  a { color: var(--rb-accent); }
+  a:hover { color: var(--rb-primary); }
+
+  /* ---- Shell ---- */
+  .rb-shell { display: flex; min-height: 100vh; }
+
+  /* ---- Rail ---- */
+  .rb-rail {
+    width: var(--rb-rail-width);
+    flex-shrink: 0;
+    background: var(--rb-primary);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Cream cap holding the primary vertical lockup */
+  .rb-rail__cap {
+    background: var(--rb-canvas);
+    padding: 26px 16px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-right: 1px solid var(--rb-border);
+  }
+  .rb-lockup__icon { width: 58px; height: auto; }
+  .rb-lockup__text { text-align: center; margin-top: 2px; }
+  .rb-lockup__name {
+    font-family: var(--rb-font-display);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--rb-primary);
+    white-space: nowrap;
+  }
+  .rb-lockup__tagline {
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--rb-accent);
+    margin-top: 3px;
+  }
+
+  /* Nav body */
+  .rb-rail__body {
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+  .rb-navgroup { display: flex; flex-direction: column; gap: 6px; }
+  .rb-navgroup__label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--rb-label-dark);
+    padding: 0 12px;
+    margin-bottom: 4px;
+  }
+
+  .rb-navitem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--rb-radius-row);
+    background: transparent;
+    text-decoration: none;
+    transition: background 120ms ease;
+  }
+  .rb-navitem:hover { background: rgba(251,249,245,0.06); }
+  .rb-navitem[aria-current="page"] { background: var(--rb-active-dark); }
+  .rb-navitem__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  .rb-navitem__text { min-width: 0; }
+  .rb-navitem__name {
+    font-family: var(--rb-font-display);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--rb-canvas);
+    white-space: nowrap;
+  }
+  .rb-navitem__sub {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rb-accent-light);
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  /* ---- Content ---- */
+  .rb-main { flex: 1; background: var(--rb-canvas); padding: 32px; }
+  .rb-main h1 {
+    font-family: var(--rb-font-display);
+    font-weight: 600;
+    font-size: 32px;
+    color: var(--rb-primary);
+    margin: 0 0 8px;
+  }
+  .rb-main p { font-size: 15px; max-width: 60ch; text-wrap: pretty; }
+  .rb-cardgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .rb-card {
+    background: var(--rb-surface);
+    border: 1px solid var(--rb-border);
+    border-radius: 12px;
+    padding: 24px;
+    min-height: 120px;
+  }
+</style>
+</head>
+<body>
+<div class="rb-shell">
+  <nav class="rb-rail" aria-label="Riverside Books">
+    <div class="rb-rail__cap">
+      <img class="rb-lockup__icon" src="icons/icon-4.png" alt="Riverside Books">
+      <div class="rb-lockup__text">
+        <div class="rb-lockup__name">RIVERSIDE BOOKS</div>
+        <div class="rb-lockup__tagline">Independent &amp; Local</div>
+      </div>
+    </div>
+
+    <div class="rb-rail__body">
+      <div class="rb-navgroup">
+        <div class="rb-navgroup__label" id="grp-customer">Customer</div>
+        <a class="rb-navitem" href="#" aria-current="page" aria-describedby="grp-customer">
+          <img class="rb-navitem__icon" src="uploads/Riverside-Readers-Icon-Transparent.png" alt="">
+          <div class="rb-navitem__text">
+            <div class="rb-navitem__name">Riverside Reader</div>
+            <div class="rb-navitem__sub">Read &amp; Discover</div>
+          </div>
+        </a>
+        <a class="rb-navitem" href="#" aria-describedby="grp-customer">
+          <img class="rb-navitem__icon" src="uploads/Riverside-Ask-icon-transparent.png" alt="">
+          <div class="rb-navitem__text">
+            <div class="rb-navitem__name">Ask Riverside</div>
+            <div class="rb-navitem__sub">Find &amp; Connect</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="rb-navgroup">
+        <div class="rb-navgroup__label" id="grp-staff">Staff</div>
+        <a class="rb-navitem" href="#" aria-describedby="grp-staff">
+          <img class="rb-navitem__icon" src="uploads/Riverside-Shelves-icon-Transparent.png" alt="">
+          <div class="rb-navitem__text">
+            <div class="rb-navitem__name">Riverside Shelves</div>
+            <div class="rb-navitem__sub">Inventory &amp; Preorders</div>
+          </div>
+        </a>
+        <a class="rb-navitem" href="#" aria-describedby="grp-staff">
+          <img class="rb-navitem__icon" src="uploads/Riverside-Press-icon-Transparent.png" alt="">
+          <div class="rb-navitem__text">
+            <div class="rb-navitem__name">Riverside Press</div>
+            <div class="rb-navitem__sub">Create &amp; Share</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="rb-main">
+    <h1>Riverside Reader</h1>
+    <p>Replace this pane with your app content. The rail is fixed at 264px; the main area flexes.</p>
+    <div class="rb-cardgrid">
+      <div class="rb-card"></div>
+      <div class="rb-card"></div>
+      <div class="rb-card"></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
