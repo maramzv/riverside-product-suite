@@ -40,10 +40,6 @@ const appSlides = [
   },
 ]
 
-function Placeholder({ children }) {
-  return <span className="rb-slide__placeholder">{children}</span>
-}
-
 function TitleSlide() {
   return (
     <div className="rb-slide rb-slide--title">
@@ -55,7 +51,9 @@ function TitleSlide() {
         experience and staff operations for an independent bookstore.
       </p>
       <p className="rb-slide__footnote">
-        <Placeholder>Add team names / course / date here</Placeholder>
+        Erick &middot; Mosiah &middot; Ishmam &middot; Mara
+        <br />
+        Pursuit AI-Native — July 2026 Cohort, L1 — August 27, 2026
       </p>
     </div>
   )
