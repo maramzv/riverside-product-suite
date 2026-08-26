@@ -163,8 +163,16 @@ body {
   flex: 1;
   min-height: 0;
 }
-.rb-productframe {
+.rb-framecrop {
+  position: relative;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--rb-surface);
+}
+.rb-productframe {
+  position: absolute;
+  top: 0;
   height: 100%;
   border: none;
   display: block;
