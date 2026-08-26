@@ -48,18 +48,18 @@ body {
   gap: 12px;
   border-right: 1px solid var(--rb-border);
 }
-.rb-lockup__icon { width: 92px; height: auto; object-fit: contain; }
+.rb-lockup__icon { width: 112px; height: auto; object-fit: contain; }
 .rb-lockup__text { text-align: center; margin-top: 2px; }
 .rb-lockup__name {
   font-family: var(--rb-font-display);
   font-weight: 600;
-  font-size: 20px;
+  font-size: 23px;
   letter-spacing: 0.06em;
   color: var(--rb-primary);
   white-space: nowrap;
 }
 .rb-lockup__tagline {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--rb-accent);
@@ -80,6 +80,7 @@ body {
   color: var(--rb-label-dark);
   padding: 0 12px;
   margin-bottom: 4px;
+  text-align: center;
 }
 
 .rb-navitem {
@@ -98,9 +99,9 @@ body {
 .rb-navitem:hover { background: rgba(251,249,245,0.06); }
 .rb-navitem[aria-current="page"] { background: var(--rb-active-dark); }
 .rb-navitem__icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -108,12 +109,12 @@ body {
 .rb-navitem__name {
   font-family: var(--rb-font-display);
   font-weight: 600;
-  font-size: 15px;
+  font-size: 18px;
   color: var(--rb-canvas);
   white-space: nowrap;
 }
 .rb-navitem__sub {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--rb-accent-light);
