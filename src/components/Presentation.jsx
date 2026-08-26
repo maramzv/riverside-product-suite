@@ -4,35 +4,39 @@ import { products } from '../config/products'
 const appSlides = [
   {
     key: 'reader',
-    owner: '@erickmarcatoma',
+    owner: 'Erick',
     users: 'Customers',
-    painPoint: 'Add this app’s pain point here — what was broken before?',
+    painPoint:
+      "Can't check if a book is in stock before making a trip, and no reason to keep coming back over a bigger chain.",
     solution:
-      'Browse the catalog, check live stock, place a pre-order for pickup, and earn a loyalty stamp with every purchase.',
+      'Search the catalog, see live stock, place a pre-order for pickup, and earn a loyalty stamp with every purchase.',
   },
   {
     key: 'ask',
-    owner: '@IshmamHaque1112',
+    owner: 'Ishmam',
     users: 'Customers',
-    painPoint: 'Add this app’s pain point here — what was broken before?',
+    painPoint:
+      'Repetitive questions — hours, return policy, upcoming events, stock — pull staff away from the register.',
     solution:
-      'A support chatbot that answers questions about stock, hours, policies, and events using real store data.',
+      "A chatbot that answers using the store's real, current data — hours, policies, events, and live stock counts.",
   },
   {
     key: 'shelves',
-    owner: '@mosiahjames-ui',
+    owner: 'Mosiah',
     users: 'Staff',
-    painPoint: 'Add this app’s pain point here — what was broken before?',
+    painPoint:
+      'Inventory tracked by memory or a paper log, so a stockout goes unnoticed until a customer asks for it.',
     solution:
-      'Live inventory view — flags low/out-of-stock titles and lists pending pre-orders to prepare.',
+      'One live view of stock by title, flags what needs reordering, and lists pending pre-orders to pull and mark ready.',
   },
   {
     key: 'press',
-    owner: '@maramzv',
+    owner: 'Mara',
     users: 'Staff',
-    painPoint: 'Add this app’s pain point here — what was broken before?',
+    painPoint:
+      'Social posting is inconsistent — writing captions takes time a two-person part-time staff doesn’t have.',
     solution:
-      'Generates a social caption and post idea for a book or event, for staff to review and publish.',
+      'Pick a book or event and get a ready-to-review social caption and post idea in under a minute.',
   },
 ]
 
@@ -63,13 +67,28 @@ function ClientSlide() {
       <div className="rb-slide__eyebrow">The Client</div>
       <h2>Riverside Books</h2>
       <p>
-        An independent bookstore that sells new books, cards, and small
-        gifts, and hosts occasional author events.
+        A single-location independent bookstore selling new books, cards,
+        and small gifts, and hosting occasional author events. The owner
+        runs day-to-day operations with two part-time booksellers —
+        inventory, orders, and customer communication were managed through
+        memory, sticky notes, and a spreadsheet.
       </p>
+      <p className="rb-slide__lede">The goal: modernize the experience without becoming a big e-commerce operation — customers still shop primarily by walking in or calling ahead.</p>
+    </div>
+  )
+}
+
+function PainPointsSlide() {
+  return (
+    <div className="rb-slide">
+      <div className="rb-slide__eyebrow">The Client</div>
+      <h2>Pain Points</h2>
       <ul className="rb-slide__list">
-        <li>Wants customers to browse, check stock, and pre-order online</li>
-        <li>Wants staff to manage inventory, questions, and promotion from one place</li>
-        <li><Placeholder>Add the client's specific ask / brief here</Placeholder></li>
+        <li>Customers can&rsquo;t check if a book is in stock or pre-order online before making a trip</li>
+        <li>No loyalty/rewards system, so regulars have no reason to keep choosing this store</li>
+        <li>Staff track inventory by memory or paper log — stockouts go unnoticed until a customer asks</li>
+        <li>Common questions (hours, return policy, events) get asked repeatedly and pull staff from the register</li>
+        <li>Social media posting is inconsistent — writing captions takes time nobody has</li>
       </ul>
     </div>
   )
@@ -79,12 +98,25 @@ function BuildSlide() {
   return (
     <div className="rb-slide">
       <div className="rb-slide__eyebrow">The Build</div>
+      <h2>Architecture</h2>
+      <ul className="rb-slide__list">
+        <li>Four products, one owner each, built independently against a shared data model</li>
+        <li>All four read from the same Supabase tables — what a customer sees in Reader matches what staff see in Shelves and what the chatbot answers with</li>
+        <li>Unified behind one React shell with a shared sidebar, and one Vercel deploy for the whole suite</li>
+      </ul>
+    </div>
+  )
+}
+
+function DesignSlide() {
+  return (
+    <div className="rb-slide">
+      <div className="rb-slide__eyebrow">The Build</div>
       <h2>Design &amp; Branding</h2>
       <ul className="rb-slide__list">
-        <li>Four independently-built products, one shared shell and nav</li>
-        <li>Consistent header height, logo lockups, and color system across every app</li>
-        <li>Forest green &amp; slate blue palette — Playfair Display + Lora type</li>
-        <li>Each product keeps its own icon, wordmark, and identity within the shared frame</li>
+        <li>Forest green &amp; slate blue palette — Playfair Display + Lora type, shared across every app</li>
+        <li>Every header shares the same height and logo lockup pattern</li>
+        <li>Each product keeps its own icon and wordmark identity within the shared frame</li>
       </ul>
     </div>
   )
@@ -96,10 +128,9 @@ function BackendSlide() {
       <div className="rb-slide__eyebrow">The Build</div>
       <h2>Backend</h2>
       <ul className="rb-slide__list">
-        <li>Supabase (Postgres) as the shared source of truth — catalog, inventory, loyalty, purchases, events</li>
-        <li>Gemini API powers Ask Riverside's chatbot, via a Vercel serverless function</li>
-        <li>React + Vite shell; each product ships as its own app or sub-project</li>
-        <li>One Vercel deploy — push to main, live in seconds</li>
+        <li>Supabase (Postgres) holds 9 shared tables — books, merchandise, customers, purchases, inventory, store info, events, and social accounts/posts</li>
+        <li>Gemini API powers Ask Riverside&rsquo;s chatbot, via a Vercel serverless function</li>
+        <li>React + Vite shell; Shelves ships as its own sub-project, built into the suite</li>
       </ul>
     </div>
   )
@@ -154,7 +185,9 @@ function ClosingSlide() {
 const slides = [
   { id: 'title', render: () => <TitleSlide /> },
   { id: 'client', render: () => <ClientSlide /> },
+  { id: 'pain-points', render: () => <PainPointsSlide /> },
   { id: 'build', render: () => <BuildSlide /> },
+  { id: 'design', render: () => <DesignSlide /> },
   { id: 'backend', render: () => <BackendSlide /> },
   ...appSlides.map((meta) => ({ id: meta.key, render: () => <AppSlide meta={meta} /> })),
   { id: 'closing', render: () => <ClosingSlide /> },
