@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riverside Press — Marketing Content Generator</title>
+  <link rel="icon" type="image/png" href="Design-files/APP-ICONS-transparent-pngs/Riverside-Press-icon-Transparent.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <img class="site-header-logo" src="/brand/press/header-wordmark.png" alt="Riverside Press — Create &amp; Share" />
+    <nav class="site-nav">
+      <a href="#promote-section">Promote</a>
+      <a href="#compose-section">Compose</a>
+      <a href="#publish-section">Publish</a>
+      <a href="#history-section">History</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card hero-card">
+      <div class="hero-decor" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 2c0 4.5-1.2 8.4-4.5 10.5C10.8 14.6 12 18.5 12 23c0-4.5 1.2-8.4 4.5-10.5C13.2 10.4 12 6.5 12 2z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2c0 4.5-1.2 8.4-4.5 10.5C10.8 14.6 12 18.5 12 23c0-4.5 1.2-8.4 4.5-10.5C13.2 10.4 12 6.5 12 2z"/></svg>
+      </div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Staff Marketing Studio</p>
+        <h1>Turn today's books into <span class="hero-highlight">tomorrow's posts</span>.</h1>
+        <p class="hero-subtext">Compose, preview, and schedule social content for every Riverside Books platform — no extra tools required.</p>
+      </div>
+    </section>
+
+    <section class="card" id="promote-section">
+      <h2>1. What are you promoting?</h2>
+      <div class="item-picker-header">
+        <div class="pill-group" id="type-pills">
+          <button type="button" class="pill" data-value="Book">&#128218; Books <span class="pill-count" id="book-count"></span></button>
+          <button type="button" class="pill" data-value="Event">&#128197; Events <span class="pill-count" id="event-count"></span></button>
+        </div>
+        <input type="text" id="item-search" class="item-search-input" autocomplete="off" placeholder="&#128269; Search titles or events..." />
+      </div>
+      <div class="item-card-grid" id="item-grid"></div>
+      <pre id="item-details"></pre>
+    </section>
+
+    <section class="card" id="compose-section">
+      <h2>2. Compose the post</h2>
+
+      <div class="compose-grid">
+        <div class="compose-main">
+          <div class="pill-field">
+            <span class="pill-field-label">Platform</span>
+            <div class="pill-group" id="platform-pills"></div>
+          </div>
+
+          <div class="pill-field">
+            <span class="pill-field-label">Post type</span>
+            <div class="pill-group" id="asset-pills">
+              <button type="button" class="pill" data-value="Text">Text only</button>
+              <button type="button" class="pill" data-value="Photo">Text + Photo</button>
+              <button type="button" class="pill" data-value="Video">Text + Video</button>
+            </div>
+          </div>
+
+          <div class="compose-row">
+            <div class="compose-text-field">
+              <textarea
+                id="caption-input"
+                rows="5"
+                placeholder="Write a caption, or generate one with AI..."
+              ></textarea>
+              <textarea
+                id="hashtag-input"
+                class="hashtag-textarea"
+                rows="2"
+                placeholder="#hashtags"
+              ></textarea>
+              <div class="tone-inline" id="tone-field">
+                <p class="tone-inline-label">Need a caption? Pick a vibe to write it instantly:</p>
+                <div class="pill-group" id="tone-pills">
+                  <button type="button" class="pill" data-value="Cozy">&#9749; Cozy / Casual</button>
+                  <button type="button" class="pill" data-value="Hype">&#128293; Urgent / Hype</button>
+                  <button type="button" class="pill" data-value="Playful">&#10024; Playful</button>
+                  <button type="button" class="pill" data-value="Staff Pick">&#11088; Staff Pick</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="upload-field hidden" id="upload-field">
+              <button type="button" id="open-finder-btn" class="upload-label">
+                <span id="upload-label-text">Upload photo</span>
+              </button>
+              <input type="file" id="media-upload" accept="image/*" hidden />
+              <button type="button" id="clear-upload-btn" class="hidden">Remove</button>
+              <span class="upload-hint">A sample image/video shows until you upload your own. Videos loop after 8s in the preview.</span>
+              <p id="upload-error" class="upload-error"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="finder-overlay hidden" id="finder-overlay">
+          <div class="finder-window">
+            <div class="finder-titlebar">
+              <span class="finder-dots"><span></span><span></span><span></span></span>
+              <span id="finder-title">Select a Photo</span>
+            </div>
+            <div class="finder-body" id="finder-grid"></div>
+            <div class="finder-footer">
+              <button type="button" id="finder-device-btn" class="finder-link-btn">Upload from this device&hellip;</button>
+              <span class="row-spacer"></span>
+              <button type="button" id="finder-cancel-btn" class="finder-secondary-btn">Cancel</button>
+              <button type="button" id="finder-open-btn" disabled>Open</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="compose-preview-col">
+          <div id="composer" class="composer composer-disabled"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="publish-section">
+      <h2>3. Publish the post</h2>
+      <div class="row">
+        <button id="post-now-btn" type="button" disabled>Post now</button>
+        <button id="schedule-toggle-btn" type="button" disabled>Schedule for later</button>
+      </div>
+      <div class="tone-panel hidden" id="schedule-panel">
+        <p class="tone-panel-label">Pick a date to schedule:</p>
+        <div class="row">
+          <input type="date" id="post-date" />
+          <button id="confirm-schedule-btn" type="button">Confirm schedule</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="history-section">
+      <div class="history-header">
+        <h2>4. Post history</h2>
+      </div>
+
+      <div class="history-filter-bar">
+        <div class="pill-group" id="history-tabs">
+          <button type="button" class="pill" data-value="upcoming">Upcoming <span id="upcoming-count" class="pill-count"></span></button>
+          <button type="button" class="pill" data-value="published">Published <span id="published-count" class="pill-count"></span></button>
+        </div>
+
+        <div class="view-switch-group">
+          <div class="pill-group view-switch" id="history-view-pills">
+            <button type="button" class="pill selected" data-value="list">List</button>
+            <button type="button" class="pill" data-value="calendar">Calendar</button>
+          </div>
+          <button type="button" id="refresh-history-btn" class="icon-btn" title="Refresh" aria-label="Refresh">&#8635;</button>
+        </div>
+      </div>
+
+      <div id="history-list-view">
+        <div class="table-scroll history-panel" id="upcoming-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Post</th>
+                <th>Item</th>
+                <th>Caption</th>
+              </tr>
+            </thead>
+            <tbody id="upcoming-body">
+              <tr class="empty-row"><td colspan="3">Nothing scheduled yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-scroll history-panel hidden" id="published-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Post</th>
+                <th>Item</th>
+                <th>Caption</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody id="published-body">
+              <tr class="empty-row"><td colspan="4">Nothing published yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="hidden" id="history-calendar-view">
+        <div class="calendar-header">
+          <button type="button" id="calendar-prev-btn" class="calendar-nav-btn">&#8592;</button>
+          <span id="calendar-month-label"></span>
+          <button type="button" id="calendar-next-btn" class="calendar-nav-btn">&#8594;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
