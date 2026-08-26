@@ -46,15 +46,23 @@ function TitleSlide() {
       <img className="rb-slide__mark" src="/brand/suite/riverside-books-icon.png" alt="" />
       <div className="rb-slide__eyebrow">Product Suite</div>
       <h1>Riverside Books</h1>
+      <div className="rb-slide__rule" aria-hidden="true" />
       <p className="rb-slide__lede">
         One shared platform, four products — modernizing the customer
         experience and staff operations for an independent bookstore.
       </p>
-      <p className="rb-slide__footnote">
-        Erick &middot; Mosiah &middot; Ishmam &middot; Mara
-        <br />
-        Pursuit AI-Native — July 2026 Cohort, L1 — August 27, 2026
-      </p>
+      <div className="rb-slide__footnote">
+        <div className="rb-slide__footnote-names">
+          <span style={{ color: 'var(--rb-primary)' }}>Erick</span>
+          <span className="rb-slide__footnote-sep">&middot;</span>
+          <span style={{ color: 'var(--rb-botanical)' }}>Mosiah</span>
+          <span className="rb-slide__footnote-sep">&middot;</span>
+          <span style={{ color: 'var(--rb-teal)' }}>Ishmam</span>
+          <span className="rb-slide__footnote-sep">&middot;</span>
+          <span style={{ color: 'var(--rb-accent)' }}>Mara</span>
+        </div>
+        <div className="rb-slide__footnote-meta">Pursuit AI-Native — July 2026 Cohort, L1 — August 27, 2026</div>
+      </div>
     </div>
   )
 }

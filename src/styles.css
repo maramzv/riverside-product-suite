@@ -262,8 +262,23 @@ body {
   color: var(--rb-text);
 }
 .rb-slide__footnote {
-  margin-top: 28px;
-  font-size: 14px;
+  margin-top: 32px;
+}
+.rb-slide__footnote-names {
+  font-family: var(--rb-font-display);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.rb-slide__footnote-sep {
+  color: var(--rb-border);
+  margin: 0 8px;
+}
+.rb-slide__footnote-meta {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--rb-botanical);
 }
 .rb-slide__list {
@@ -304,9 +319,15 @@ body {
   text-align: center;
 }
 .rb-slide__mark {
-  width: 96px;
+  width: 108px;
   height: auto;
-  margin: 0 auto 20px;
+  margin: 0 auto 18px;
+}
+.rb-slide__rule {
+  width: 56px;
+  height: 2px;
+  margin: 22px auto;
+  background: var(--rb-accent);
 }
 
 .rb-slide--app .rb-slide__app-head {
