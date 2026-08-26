@@ -51,9 +51,15 @@ GEMINI_API_KEY=your_key_here
 Get a key at https://aistudio.google.com/apikey. In production, the same
 variable is set in Vercel's project environment settings, not in this repo.
 
+## Contributing
+
+Each product's own app folder is fair game to change freely. The shared
+nav sidebar and logo assets are locked behind review — see
+[CONTRIBUTING.md](CONTRIBUTING.md) for what's locked, why, and how PRs work.
+
 ## Deploying
 
-Pushing to `main` auto-deploys to Vercel. To deploy manually instead:
+Merging to `main` auto-deploys to Vercel. To deploy manually instead:
 
 ```bash
 vercel --prod
