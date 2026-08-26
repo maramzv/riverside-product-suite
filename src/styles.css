@@ -13,6 +13,7 @@
   --rb-active-dark:  rgba(251,249,245,0.10);
 
   --rb-rail-width: 300px;
+  --rb-rail-width-collapsed: 72px;
   --rb-radius-row: 10px;
   --rb-font-display: 'Playfair Display', Georgia, serif;
   --rb-font-body: 'Lora', Georgia, serif;
@@ -31,12 +32,41 @@ body {
 
 /* ---- Rail ---- */
 .rb-rail {
+  position: relative;
   width: var(--rb-rail-width);
   flex-shrink: 0;
   background: var(--rb-primary);
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   overflow-y: auto;
+  transition: width 240ms ease;
+}
+.rb-rail--collapsed {
+  width: var(--rb-rail-width-collapsed);
+}
+
+.rb-rail__toggle {
+  margin: 4px auto 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--rb-botanical);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 120ms ease, color 120ms ease;
+}
+.rb-rail__toggle:hover {
+  background: rgba(251,249,245,0.06);
+  color: var(--rb-canvas);
+}
+.rb-rail__toggle-arrow {
+  font-size: 18px;
+  line-height: 1;
 }
 
 .rb-rail__cap {
@@ -47,8 +77,17 @@ body {
   align-items: center;
   gap: 12px;
   border-right: 1px solid var(--rb-border);
+  transition: height 240ms ease, padding 240ms ease;
 }
-.rb-lockup__icon { width: 112px; height: auto; object-fit: contain; }
+.rb-rail--collapsed .rb-rail__cap {
+  height: 130px;
+  padding: 0 8px;
+  justify-content: center;
+}
+.rb-rail--collapsed .rb-lockup__icon {
+  width: 40px;
+}
+.rb-lockup__icon { width: 112px; height: auto; object-fit: contain; transition: width 240ms ease; }
 .rb-lockup__text { text-align: center; margin-top: 2px; }
 .rb-lockup__name {
   font-family: var(--rb-font-display);
@@ -72,7 +111,14 @@ body {
   flex-direction: column;
   gap: 26px;
 }
+.rb-rail--collapsed .rb-rail__body {
+  padding: 32px 10px 24px;
+  gap: 14px;
+}
 .rb-navgroup { display: flex; flex-direction: column; gap: 6px; }
+.rb-rail--collapsed .rb-navgroup {
+  gap: 14px;
+}
 .rb-navgroup__label {
   font-size: 10px;
   letter-spacing: 0.16em;
@@ -104,6 +150,14 @@ body {
   border-radius: 10px;
   object-fit: contain;
   flex-shrink: 0;
+}
+.rb-rail--collapsed .rb-navitem {
+  justify-content: center;
+  padding: 8px;
+}
+.rb-rail--collapsed .rb-navitem__icon {
+  width: 40px;
+  height: 40px;
 }
 .rb-navitem__text { min-width: 0; }
 .rb-navitem__name {
