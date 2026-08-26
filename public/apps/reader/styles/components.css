@@ -1,24 +1,10 @@
 /* =========================================
-   NAVBAR ALIGNMENT & BRAND LOGO
+   BRAND LOGO
+   (.navbar / .nav-brand live in main.css — not duplicated here)
 ========================================= */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2.5rem;
-  background: white;
-  border-bottom: 1px solid #eee;
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
 .brand-logo-img {
   width: auto;
-  height: 84px;
+  height: 100px;
   object-fit: contain;
 }
 
