@@ -1,0 +1,11 @@
+# See CONTRIBUTING.md for what this locks and why.
+# Nobody else needs to be listed here — files not matched below can be
+# merged by whoever opens the PR, no review required.
+
+# Nav shell (collapsible sidebar all four products sit behind)
+/src/components/Sidebar.jsx @maramzv
+/src/App.jsx                @maramzv
+/src/styles.css              @maramzv
+
+# Logos referenced by every app's header
+/public/brand/                @maramzv
