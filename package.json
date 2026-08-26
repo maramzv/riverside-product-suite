@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run build:shelves && vite",
+    "build:shelves": "npm --prefix apps/shelves install && npm --prefix apps/shelves run build",
+    "build": "npm run build:shelves && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

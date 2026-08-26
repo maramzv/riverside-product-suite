@@ -2,3 +2,11 @@ node_modules
 dist
 .DS_Store
 *.local
+.env
+.env.local
+apps/shelves/node_modules
+apps/shelves/dist
+public/apps/shelves
+
+.vercel
+.env*

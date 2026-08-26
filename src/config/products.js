@@ -6,11 +6,12 @@ export const products = {
     tagline: 'READ & DISCOVER',
     icon: '/brand/reader/icon.png',
     headerWordmark: '/brand/reader/header-wordmark.png',
-    url: 'https://riverside-readers-app.vercel.app',
-    // Reader renders its own copy of the full 4-product suite sidebar
-    // (a fixed 288px <aside>, Tailwind w-72) baked into every page.
-    // We crop it out of the iframe rather than touching Erick's repo.
-    sidebarCropPx: 288,
+    // Cloned from erickmarcatoma/riverside-readers-app, served same-origin
+    // out of public/apps/reader. Its own duplicate suite sidebar was
+    // removed and its header logo swapped for our wordmark directly in
+    // that copy — see public/apps/reader/*.html.
+    url: '/apps/reader/index.html',
+    liveUrl: 'https://riverside-readers-app.vercel.app',
   },
   ask: {
     key: 'ask',
@@ -19,9 +20,10 @@ export const products = {
     tagline: 'FIND & CONNECT',
     icon: '/brand/ask/icon.png',
     headerWordmark: '/brand/ask/header-wordmark.png',
-    url: 'https://riverside-books-chatbot-khaki.vercel.app',
-    // Same story: a 264px suite sidebar, open by default.
-    sidebarCropPx: 264,
+    // Cloned from IshmamHaque1112/riverside-books-chatbot. Its Gemini
+    // serverless function lives at /api/gemini.js in this repo now.
+    url: '/apps/ask/index.html',
+    liveUrl: 'https://riverside-books-chatbot-khaki.vercel.app',
   },
   shelves: {
     key: 'shelves',
@@ -30,9 +32,10 @@ export const products = {
     tagline: 'INVENTORY & PREORDERS',
     icon: '/brand/shelves/icon.png',
     headerWordmark: '/brand/shelves/header-wordmark.png',
-    url: 'https://riverside-inventory-app.vercel.app',
-    // Same story: a 248px suite sidebar (`.sidebar` in App.css).
-    sidebarCropPx: 248,
+    // Cloned from mosiahjames-ui/riverside-inventory-app, its own Vite
+    // build under apps/shelves, output into public/apps/shelves.
+    url: '/apps/shelves/index.html',
+    liveUrl: 'https://riverside-inventory-app.vercel.app',
   },
   press: {
     key: 'press',
@@ -41,9 +44,9 @@ export const products = {
     tagline: 'CREATE & SHARE',
     icon: '/brand/press/icon.png',
     headerWordmark: '/brand/press/header-wordmark.png',
-    url: 'https://riverside-social-app.vercel.app',
-    // Press has no internal suite sidebar — nothing to crop.
-    sidebarCropPx: 0,
+    // Cloned from maramzv/riverside-social-app.
+    url: '/apps/press/index.html',
+    liveUrl: 'https://riverside-social-app.vercel.app',
   },
 }
 

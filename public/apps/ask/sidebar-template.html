@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riverside Books Sidebar Template</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#FBF9F5',
+            primary: '#1B3B2B',
+            'primary-dark': '#152A1F',
+            text: '#2C2C2C',
+            accent: '#7A8B79',
+            teal: '#2D6A6F',
+            'teal-light': '#3D7A7F',
+            sky: '#3E7CB1',
+            'sky-light': '#4E8CC1',
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            body: ['"Lora"', 'Georgia', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background-color: #FBF9F5;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+  </style>
+</head>
+<body class="bg-bg text-text min-h-screen p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="font-serif text-3xl font-bold text-primary mb-2">Riverside Books Sidebar Template</h1>
+    <p class="text-accent mb-8">Use this template to implement the sidebar across all Riverside Books project websites</p>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- Full Sidebar Template -->
+      <div class="bg-white rounded-xl shadow-lg p-6 border border-accent/30">
+        <h2 class="font-serif text-xl font-bold text-primary mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-arrows-left-right text-teal"></i>
+          Full Sidebar (Expanded)
+        </h2>
+        <p class="text-sm text-accent mb-4">When sidebar is fully expanded, shows logo, company name, and all navigation links</p>
+        
+        <div class="bg-bg rounded-lg overflow-hidden border border-accent/20">
+          <div className="w-[264px] bg-primary text-bg flex flex-col shadow-xl">
+            {/* Cream Cap - Riverside Books Logo */}
+            <div className="bg-bg p-4 border-r border-accent/30 flex flex-col items-center gap-2 relative">
+              <img src="riverside-logo.png" alt="Riverside Books" className="w-[58px] h-auto object-contain" />
+              <div className="text-center">
+                <div className="font-serif font-semibold text-[15px] tracking-wider text-primary whitespace-nowrap">RIVERSIDE BOOKS</div>
+                <div className="text-[8px] tracking-[0.16em] uppercase text-sky mt-1">Independent & Local</div>
+              </div>
+              <button className="absolute top-4 right-4 text-accent hover:text-bg transition p-1" title="Close sidebar">
+                <i className="fa-solid fa-xmark text-lg"></i>
+              </button>
+            </div>
+
+            {/* Navigation Body */}
+            <div className="flex-1 p-4 flex flex-col gap-6">
+              {/* Customer Section */}
+              <div className="flex flex-col gap-1">
+                <div className="text-[10px] tracking-[0.16em] uppercase text-accent/70 px-3 mb-1">Customer</div>
+                
+                <a href="https://riverside-readers-app.vercel.app/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-bg/10 transition group">
+                  <img src="Riverside-Readers-Icon-Transparent.png" alt="" className="w-9 h-9 rounded-lg object-contain" />
+                  <div className="min-w-0">
+                    <div className="font-serif font-semibold text-[15px] text-bg whitespace-nowrap">Riverside Reader</div>
+                    <div className="text-[9px] tracking-[0.12em] uppercase text-sky/80 mt-0.5 whitespace-nowrap">Read & Discover</div>
+                  </div>
+                </a>
+                
+                <a href="https://riverside-books-chatbot-khaki.vercel.app/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-bg/10 transition group" aria-current="page">
+                  <img src="Riverside-Ask-icon-transparent.png" alt="" className="w-9 h-9 rounded-lg object-contain" />
+                  <div className="min-w-0">
+                    <div className="font-serif font-semibold text-[15px] text-bg whitespace-nowrap">Ask Riverside</div>
+                    <div className="text-[9px] tracking-[0.12em] uppercase text-sky/80 mt-0.5 whitespace-nowrap">Find & Connect</div>
+                  </div>
+                </a>
+              </div>
+
+              {/* Staff Section */}
+              <div className="flex flex-col gap-1">
+                <div className="text-[10px] tracking-[0.16em] uppercase text-accent/70 px-3 mb-1">Staff</div>
+                
+                <a href="https://riverside-inventory-app.vercel.app/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-bg/10 transition group">
+                  <img src="Riverside-Shelves-icon-Transparent.png" alt="" className="w-9 h-9 rounded-lg object-contain" />
+                  <div className="min-w-0">
+                    <div className="font-serif font-semibold text-[15px] text-bg whitespace-nowrap">Riverside Shelves</div>
+                    <div className="text-[9px] tracking-[0.12em] uppercase text-sky/80 mt-0.5 whitespace-nowrap">Inventory & Preorders</div>
+                  </div>
+                </a>
+                
+                <a href="https://riverside-social-app.vercel.app/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-bg/10 transition group">
+                  <img src="Riverside-Press-icon-Transparent.png" alt="" className="w-9 h-9 rounded-lg object-contain" />
+                  <div className="min-w-0">
+                    <div className="font-serif font-semibold text-[15px] text-bg whitespace-nowrap">Riverside Press</div>
+                    <div className="text-[9px] tracking-[0.12em] uppercase text-sky/80 mt-0.5 whitespace-nowrap">Create & Share</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            {/* Sidebar Footer */}
+            <div className="p-4 border-t border-primary-dark">
+              <div className="text-xs text-accent">
+                <p>© 2024 Riverside Books</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsed Sidebar Template -->
+      <div class="bg-white rounded-xl shadow-lg p-6 border border-accent/30">
+        <h2 class="font-serif text-xl font-bold text-primary mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-arrows-left-right text-teal"></i>
+          Collapsed Sidebar (Closed)
+        </h2>
+        <p class="text-sm text-accent mb-4">When sidebar is collapsed, shows only the logo. Click to expand.</p>
+        
+        <div class="bg-bg rounded-lg overflow-hidden border border-accent/20">
+          <div className="w-16 bg-primary text-bg flex flex-col shadow-xl">
+            {/* Cream Cap - Riverside Books Logo */}
+            <div className="bg-bg p-4 border-r border-accent/30 flex flex-col items-center gap-2">
+              <button className="w-full flex items-center justify-center p-2 hover:bg-primary-dark transition rounded-lg" title="Open sidebar">
+                <img src="riverside-logo.png" alt="Riverside Books" className="w-10 h-10 object-contain" />
+              </button>
+            </div>
+
+            {/* Sidebar Footer */}
+            <div className="flex-1"></div>
+            <div className="p-4 border-t border-primary-dark">
+              <div className="text-xs text-accent text-center">
+                <p>© 2024</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Implementation Guide -->
+    <div class="mt-8 bg-white rounded-xl shadow-lg p-6 border border-accent/30">
+      <h2 class="font-serif text-xl font-bold text-primary mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-code text-teal"></i>
+        Implementation Guide
+      </h2>
+      
+      <div class="space-y-4 text-sm">
+        <div>
+          <h3 class="font-semibold text-primary mb-2">Design Tokens (Use these exact colors):</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-primary border border-accent/30"></div>
+              <span class="text-accent">Primary: #1B3B2B</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-bg border border-accent/30"></div>
+              <span class="text-accent">Background: #FBF9F5</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-teal border border-accent/30"></div>
+              <span class="text-accent">Teal: #2D6A6F</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-accent border border-accent/30"></div>
+              <span class="text-accent">Accent: #7A8B79</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-primary mb-2">Typography:</h3>
+          <ul class="list-disc list-inside text-accent space-y-1">
+            <li>Headings: Playfair Display, Georgia, serif</li>
+            <li>Body: Lora, Georgia, serif</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-primary mb-2">Navigation Links:</h3>
+          <ul class="list-disc list-inside text-accent space-y-1">
+            <li>Riverside Reader: https://riverside-readers-app.vercel.app/</li>
+            <li>Ask Riverside: https://riverside-books-chatbot-khaki.vercel.app/</li>
+            <li>Riverside Shelves: https://riverside-inventory-app.vercel.app/</li>
+            <li>Riverside Press: https://riverside-social-app.vercel.app/</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-primary mb-2">Behavior:</h3>
+          <ul class="list-disc list-inside text-accent space-y-1">
+            <li>Click X button in full sidebar to collapse</li>
+            <li>Click logo in collapsed sidebar to expand</li>
+            <li>Smooth transition animation (300ms)</li>
+            <li>Current page highlighted with teal background</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color Reference -->
+    <div class="mt-8 bg-white rounded-xl shadow-lg p-6 border border-accent/30">
+      <h2 class="font-serif text-xl font-bold text-primary mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-palette text-teal"></i>
+        Color Reference
+      </h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="space-y-2">
+          <div class="w-full h-12 rounded-lg bg-primary border border-accent/30"></div>
+          <p class="text-xs font-medium text-primary">Primary (Dark Green)</p>
+          <p class="text-xs text-accent">#1B3B2B</p>
+        </div>
+        <div class="space-y-2">
+          <div class="w-full h-12 rounded-lg bg-bg border border-accent/30"></div>
+          <p class="text-xs font-medium text-primary">Background (Parchment)</p>
+          <p class="text-xs text-accent">#FBF9F5</p>
+        </div>
+        <div class="space-y-2">
+          <div class="w-full h-12 rounded-lg bg-text border border-accent/30"></div>
+          <p class="text-xs font-medium text-primary">Text (Dark Gray)</p>
+          <p class="text-xs text-accent">#2C2C2C</p>
+        </div>
+        <div class="space-y-2">
+          <div class="w-full h-12 rounded-lg bg-accent border border-accent/30"></div>
+          <p class="text-xs font-medium text-primary">Accent (Botanical)</p>
+          <p class="text-xs text-accent">#7A8B79</p>
+        </div>
+        <div class="space-y-2">
+          <div class="w-full h-12 rounded-lg bg-teal border border-accent/30"></div>
+          <p class="text-xs font-medium text-primary">Teal Accent</p>
+          <p class="text-xs text-accent">#2D6A6F</p>
+        </div>
+        <div class="space-y-2">
+          <div class="w-full h-12 rounded-lg bg-sky border border-accent/30"></div>
+          <p class="text-xs font-medium text-primary">Sky Blue Accent</p>
+          <p class="text-xs text-accent">#3E7CB1</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

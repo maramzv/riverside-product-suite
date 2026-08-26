@@ -1,0 +1,12 @@
+{
+  "name": "riverside-books-chatbot",
+  "version": "1.0.0",
+  "description": "AI chatbot for Riverside Books customer support",
+  "scripts": {
+    "dev": "echo 'Static HTML file - no build required'",
+    "build": "echo 'Static HTML file - no build required'"
+  },
+  "keywords": ["chatbot", "customer-support", "riverside-books"],
+  "author": "",
+  "license": "MIT"
+}

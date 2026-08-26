@@ -13,7 +13,6 @@
   --rb-active-dark:  rgba(251,249,245,0.10);
 
   --rb-rail-width: 300px;
-  --rb-header-height: 96px;
   --rb-radius-row: 10px;
   --rb-font-display: 'Playfair Display', Georgia, serif;
   --rb-font-body: 'Lora', Georgia, serif;
@@ -131,48 +130,12 @@ body {
   background: var(--rb-canvas);
 }
 
-.rb-suiteheader {
-  height: var(--rb-header-height);
-  flex-shrink: 0;
-  background: var(--rb-canvas);
-  border-bottom: 1px solid var(--rb-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-}
-.rb-suiteheader__brand {
-  width: 340px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-.rb-suiteheader__brand img {
-  max-height: 56px;
-  max-width: 100%;
-  object-fit: contain;
-}
-.rb-suiteheader__hint {
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--rb-botanical);
-  font-style: italic;
-}
-
 .rb-frame-area {
   flex: 1;
   min-height: 0;
 }
-.rb-framecrop {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: var(--rb-surface);
-}
 .rb-productframe {
-  position: absolute;
-  top: 0;
+  width: 100%;
   height: 100%;
   border: none;
   display: block;
