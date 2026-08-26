@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Riverside Books - Shared Sidebar</title>
+</head>
+<body>
+  <div class="flex min-h-screen">
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-[#1B3B2B] text-white flex flex-col justify-between p-6 shrink-0">
+      <div>
+        <!-- Header Logo -->
+        <div class="flex items-center space-x-3 mb-8">
+          <img src="/Riverside-Shelves-Header-Logo-trasnparent.png" alt="Riverside Shelves Logo" class="h-8 w-auto" />
+        </div>
+
+        <!-- Navigation Apps List -->
+        <nav class="space-y-4">
+          <!-- Customer Facing Header Link -->
+          <div class="text-xs font-semibold uppercase tracking-wider text-emerald-300/70 mb-2">Customer</div>
+          <a href="https://riverside-product-suite.vercel.app/" class="flex items-center space-x-3 text-emerald-100 hover:text-white transition-colors">
+            <img src="/Riverside-Header-icon.png" class="w-5 h-5" alt="" />
+            <span class="text-sm font-medium">Riverside Header</span>
+          </a>
+          <a href="https://riverside-books-chatbot-khaki.vercel.app" target="_blank" class="flex items-center space-x-3 text-emerald-100 hover:text-white transition-colors">
+            <img src="/Riverside-Ask-icon-transparent.png" class="w-5 h-5" alt="" />
+            <span class="text-sm font-medium">Ask Riverside</span>
+          </a>
+
+          <!-- Staff Facing Apps -->
+          <div class="text-xs font-semibold uppercase tracking-wider text-emerald-300/70 mt-6 mb-2">Staff</div>
+          <a href="https://riverside-inventory-app.vercel.app" class="flex items-center space-x-3 text-white font-semibold bg-white/10 p-2 rounded-md">
+            <img src="/Riverside-Shelves-icon-Transparent.png" class="w-5 h-5" alt="" />
+            <span class="text-sm">Riverside Shelves</span>
+          </a>
+          <a href="https://riverside-press-app.vercel.app" target="_blank" class="flex items-center space-x-3 text-emerald-100 hover:text-white transition-colors">
+            <img src="/Riverside-Press-icon-Transparent.png" class="w-5 h-5" alt="" />
+            <span class="text-sm font-medium">Riverside Press</span>
+          </a>
+          <a href="https://riverside-readers-app.vercel.app" target="_blank" class="flex items-center space-x-3 text-emerald-100 hover:text-white transition-colors">
+            <img src="/Riverside-Readers-Icon-Transparent.png" class="w-5 h-5" alt="" />
+            <span class="text-sm font-medium">Riverside Readers</span>
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 p-8 bg-[#FBF9F5]">
+      <!-- Your existing page content goes here -->
+    </main>
+  </div>
+</body>
+</html>
