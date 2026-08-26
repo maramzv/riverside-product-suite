@@ -21,8 +21,6 @@ export const DEMO_UPLOADS = {
     { name: "shelf-flatlay.png", path: "assets/demo-uploads/images/shelf-flatlay.png" },
   ],
   Video: [
-    { name: "staff-pick-loop.webm", path: "assets/demo-uploads/videos/staff-pick-loop.webm" },
-    { name: "countdown-loop.webm", path: "assets/demo-uploads/videos/countdown-loop.webm" },
     { name: "12129507_2160_3840_30fps.mp4", path: "assets/demo-uploads/videos/12129507_2160_3840_30fps.mp4" },
     { name: "13324114-uhd_2160_3840_24fps.mp4", path: "assets/demo-uploads/videos/13324114-uhd_2160_3840_24fps.mp4" },
     { name: "13690752_1920_1080_100fps.mp4", path: "assets/demo-uploads/videos/13690752_1920_1080_100fps.mp4" },
