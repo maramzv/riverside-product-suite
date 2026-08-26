@@ -29,7 +29,7 @@ export const products = {
     key: 'shelves',
     group: 'Staff',
     name: 'Riverside Shelves',
-    tagline: 'INVENTORY & PREORDERS',
+    tagline: 'INVENTORY & FULFILLMENT',
     icon: '/brand/shelves/icon.png',
     headerWordmark: '/brand/shelves/header-wordmark.png',
     // Cloned from mosiahjames-ui/riverside-inventory-app, its own Vite
