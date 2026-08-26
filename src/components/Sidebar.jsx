@@ -8,7 +8,13 @@ export default function Sidebar({ activeKey, onSelect, collapsed, onToggleCollap
       className={`rb-rail${collapsed ? ' rb-rail--collapsed' : ''}`}
       aria-label="Riverside Books"
     >
-      <div className="rb-rail__cap">
+      <button
+        type="button"
+        className={`rb-rail__cap${activeKey === 'home' ? ' rb-rail__cap--active' : ''}`}
+        onClick={() => onSelect('home')}
+        aria-current={activeKey === 'home' ? 'page' : undefined}
+        title={collapsed ? 'Riverside Books — Home' : undefined}
+      >
         <img className="rb-lockup__icon" src="/brand/suite/riverside-books-icon.png" alt="Riverside Books" />
         {!collapsed && (
           <div className="rb-lockup__text">
@@ -16,7 +22,7 @@ export default function Sidebar({ activeKey, onSelect, collapsed, onToggleCollap
             <div className="rb-lockup__tagline">Independent &amp; Local</div>
           </div>
         )}
-      </div>
+      </button>
 
       <div className="rb-rail__body">
         {groups.map((group) => (

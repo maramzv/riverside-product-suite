@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import ProductFrame from './components/ProductFrame'
+import Presentation from './components/Presentation'
 import { products } from './config/products'
 
 export default function App() {
-  const [activeKey, setActiveKey] = useState('reader')
+  const [activeKey, setActiveKey] = useState('home')
   const [collapsed, setCollapsed] = useState(false)
   const product = products[activeKey]
 
@@ -18,7 +19,7 @@ export default function App() {
       />
       <main className="rb-main">
         <div className="rb-frame-area">
-          <ProductFrame product={product} />
+          {product ? <ProductFrame product={product} /> : <Presentation />}
         </div>
       </main>
     </div>
