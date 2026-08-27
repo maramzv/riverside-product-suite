@@ -30,16 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
    STEP 1 & 2: Search, Filter & Load Inventory (Home & Shop)
 ---------------------------------------------------- */
 async function loadFeaturedBooks(category = 'all', searchQuery = '') {
+  const isHomePageContainer = !!document.getElementById('books-container');
   const container = document.getElementById('books-container') || document.getElementById('full-inventory-container');
   if (!container) return;
-  
+
   container.innerHTML = `<div class="book-card-loading">Searching Supabase catalog...</div>`;
 
   try {
-    const books = await InventoryAPI.getBooks(category, searchQuery);
+    let books = await InventoryAPI.getBooks(category, searchQuery);
     currentBooksCache = books || [];
 
-    renderBookList(currentBooksCache, container);
+    // Limit featured titles to 6 strictly on the home page container
+    if (isHomePageContainer && (!searchQuery || searchQuery === '') && category === 'all') {
+      books = currentBooksCache.slice(0, 6);
+    } else {
+      books = currentBooksCache;
+    }
+
+    renderBookList(books, container);
 
   } catch (err) {
     container.innerHTML = `
@@ -97,11 +105,11 @@ async function loadStaffPicks() {
           </div>
           <div class="book-info">
             <h4>${displayTitle}</h4>
-            <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: #4a5568; margin: 0.25rem 0 0.5rem 0;">
+            <p class="book-author" style="margin-bottom: 0.4rem;">by ${book.author}</p>
+            <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: #4a5568; margin: 0 0 0.5rem 0;">
               <span style="width: 8px; height: 8px; background-color: ${dotColor}; border-radius: 50%; display: inline-block;"></span>
               <span>${stockText}</span>
             </div>
-            <p class="book-author">by ${book.author}</p>
             ${staffBlurb}
             
             <!-- Price and Button Wrapper aligned uniformly at the bottom -->
@@ -163,12 +171,12 @@ function renderBookList(books, container) {
         </div>
         <div class="book-info">
           <h4>${displayTitle}</h4>
-          <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: #4a5568; margin: 0.25rem 0 0.5rem 0;">
+          <p class="book-author" style="margin-bottom: 0.4rem;">by ${book.author}</p>
+          <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: #4a5568; margin: 0 0 0.5rem 0;">
             <span style="width: 8px; height: 8px; background-color: ${dotColor}; border-radius: 50%; display: inline-block;"></span>
             <span>${stockText}</span>
           </div>
-          <p class="book-author">by ${book.author}</p>
-          
+
           <!-- Price and Button Wrapper aligned uniformly at the bottom -->
           <div style="margin-top: auto; padding-top: 0.75rem;">
             <p class="book-price" style="margin-bottom: 0.5rem; font-weight: bold;">$${Number(book.regular_price || 0).toFixed(2)}</p>
@@ -214,6 +222,7 @@ function initReservationForm() {
     const customerName = document.getElementById('customer-name').value;
     const customerEmail = document.getElementById('customer-email').value;
     const customerPhone = document.getElementById('customer-phone').value;
+    const quantity = parseInt(document.getElementById('reservation-quantity')?.value) || 1;
 
     try {
       const book = await InventoryAPI.getBookByIsbn(isbn);
@@ -223,7 +232,7 @@ function initReservationForm() {
         customerName,
         customerEmail,
         customerPhone,
-        quantity: 1,
+        quantity: quantity,
         regularPrice: book.regular_price
       });
 
@@ -274,7 +283,14 @@ function renderLoyaltyGrid(earnedCount = 0) {
     if (!banner && container) {
       banner = document.createElement('div');
       banner.className = 'reward-banner';
-      banner.innerHTML = '🎉 <strong>REWARD UNLOCKED!</strong> Show this screen at the counter for your free book or drink!';
+      banner.innerHTML = `
+        🎉 <strong>REWARD UNLOCKED!</strong> Choose your 10/10 perk to redeem at the counter:
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; justify-content: center; flex-wrap: wrap;">
+          <button class="btn-dark btn-small" onclick="alert('Selected: Free Book! Show this screen at the register.')">Free Book</button>
+          <button class="btn-dark btn-small" onclick="alert('Selected: Exclusive Access! Show this screen at the register.')">Exclusive Access</button>
+          <button class="btn-dark btn-small" onclick="alert('Selected: Reading Accessories &amp; Keepsakes! Show this screen at the register.')">Keepsakes</button>
+        </div>
+      `;
       container.insertBefore(banner, grid);
     }
   } else {
@@ -435,11 +451,33 @@ function initMobileMenu() {
     hamburger = document.createElement('button');
     hamburger.className = 'mobile-menu-toggle';
     hamburger.innerHTML = '☰ Menu';
-    
-    navbar.insertBefore(hamburger, navLinks);
 
-    hamburger.addEventListener('click', () => {
+    navbar.insertBefore(hamburger, navLinks);
+  }
+
+  if (hamburger && navLinks) {
+    // Force the menu to always start closed upon script initialization
+    navLinks.classList.remove('mobile-open');
+
+    // Toggle open/closed strictly on explicit hamburger button clicks
+    hamburger.onclick = (e) => {
+      e.stopPropagation();
       navLinks.classList.toggle('mobile-open');
+    };
+
+    // Ensure clicking any navigation link hides the menu
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navLinks.classList.remove('mobile-open');
+      });
+    });
+
+    // Close the menu if a user clicks anywhere else outside the navbar
+    document.addEventListener('click', (e) => {
+      if (!navbar.contains(e.target)) {
+        navLinks.classList.remove('mobile-open');
+      }
     });
   }
 }

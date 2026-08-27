@@ -100,15 +100,24 @@ function PainPointsSlide() {
   )
 }
 
-function BuildSlide() {
+function ArchitectureBackendSlide() {
   return (
     <div className="rb-slide">
       <div className="rb-slide__eyebrow">The Build</div>
-      <h2>Architecture</h2>
+      <h2>Architecture &amp; Backend</h2>
       <ul className="rb-slide__list">
-        <li>Four products, one owner each, built independently against a shared data model</li>
-        <li>All four read from the same Supabase tables — what a customer sees in Reader matches what staff see in Shelves and what the chatbot answers with</li>
-        <li>Unified behind one React shell with a shared sidebar, and one Vercel deploy for the whole suite</li>
+        <li>Four products, one owner each, built independently, then unified behind one React + Vite shell with a shared sidebar and a single Vercel deploy</li>
+        <li>All four read from the same Supabase (Postgres) backend, which holds 9 shared tables covering books, merchandise, customers, purchases, inventory, store info, events, and social accounts/posts</li>
+        <li>Ask Riverside&rsquo;s chatbot runs on the Gemini API through a Vercel serverless function</li>
+        <li>
+          Take one book — all four products pull from the exact same record:
+          <ul className="rb-slide__list rb-slide__list--nested">
+            <li><strong>Riverside Reader</strong> shows customers the book is currently stocked in store and lets them reserve a copy</li>
+            <li><strong>Riverside Shelves</strong> counts how many copies are on the shelf and gets reservations ready</li>
+            <li><strong>Ask Riverside</strong> answers questions about it (price, stock) and lets customers reserve a copy</li>
+            <li><strong>Riverside Press</strong> turns it into a social post</li>
+          </ul>
+        </li>
       </ul>
     </div>
   )
@@ -123,20 +132,6 @@ function DesignSlide() {
         <li>Forest green &amp; slate blue palette — Playfair Display + Lora type, shared across every app</li>
         <li>Every header shares the same height and logo lockup pattern</li>
         <li>Each product keeps its own icon and wordmark identity within the shared frame</li>
-      </ul>
-    </div>
-  )
-}
-
-function BackendSlide() {
-  return (
-    <div className="rb-slide">
-      <div className="rb-slide__eyebrow">The Build</div>
-      <h2>Backend</h2>
-      <ul className="rb-slide__list">
-        <li>Supabase (Postgres) holds 9 shared tables — books, merchandise, customers, purchases, inventory, store info, events, and social accounts/posts</li>
-        <li>Gemini API powers Ask Riverside&rsquo;s chatbot, via a Vercel serverless function</li>
-        <li>React + Vite shell; Shelves ships as its own sub-project, built into the suite</li>
       </ul>
     </div>
   )
@@ -192,9 +187,8 @@ const slides = [
   { id: 'title', render: () => <TitleSlide /> },
   { id: 'client', render: () => <ClientSlide /> },
   { id: 'pain-points', render: () => <PainPointsSlide /> },
-  { id: 'build', render: () => <BuildSlide /> },
+  { id: 'architecture-backend', render: () => <ArchitectureBackendSlide /> },
   { id: 'design', render: () => <DesignSlide /> },
-  { id: 'backend', render: () => <BackendSlide /> },
   ...appSlides.map((meta) => ({ id: meta.key, render: () => <AppSlide meta={meta} /> })),
   { id: 'closing', render: () => <ClosingSlide /> },
 ]
