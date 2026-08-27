@@ -111,6 +111,7 @@
       <button id="close-modal-btn" class="close-btn">&times;</button>
       <h2>Reserve for Pickup</h2>
       <h3 id="modal-book-title"></h3>
+      <button type="button" class="demo-prefill" data-demo-fill="reserve">&#10022; DEMO &mdash; Prefill this form</button>
       
       <form id="reserve-form">
         <input type="hidden" id="modal-isbn" required>
@@ -141,6 +142,7 @@
 
       <!-- Login View -->
       <div id="account-login-view">
+        <button type="button" class="demo-prefill" data-demo-fill="account">&#10022; DEMO &mdash; Prefill email</button>
         <form id="account-form">
           <div class="form-group">
             <label for="account-email-input">Email Address</label>
@@ -186,6 +188,7 @@
       <div class="loyalty-status-box">
         <h4>Rewards Progress</h4>
         <p id="stamps-modal-progress" class="stamp-summary-text">0 / 10 stamps earned</p>
+        <div class="stamp-grid-container stamp-grid-container--compact" id="stamps-modal-grid"></div>
       </div>
 
       <div class="modal-actions">

@@ -198,5 +198,23 @@ export const InventoryAPI = {
       console.error('Supabase Error fetching loyalty points:', error);
       return 0;
     }
+  },
+
+  // Demo helper: returns one random customer from a curated, known-good set so
+  // the "DEMO — Prefill" links can populate the forms with real Supabase data.
+  async getDemoCustomer() {
+    if (!supabase) throw new Error("Supabase client not initialized.");
+
+    const DEMO_CUSTOMER_IDS = ['CUST-010', 'CUST-025', 'CUST-024'];
+    const pick = DEMO_CUSTOMER_IDS[Math.floor(Math.random() * DEMO_CUSTOMER_IDS.length)];
+
+    const { data, error } = await supabase
+      .from('Customers')
+      .select('customer_id, first_name, last_name, email, phone, stamp_count')
+      .eq('customer_id', pick)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
   }
 };

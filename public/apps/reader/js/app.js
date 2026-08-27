@@ -22,9 +22,48 @@ document.addEventListener('DOMContentLoaded', () => {
   initFilterTags();
   initShopFilters(); 
   initSortHandler();
-  initMobileMenu(); 
+  initMobileMenu();
   initNavbarActions();
+  initDemoPrefill();
 });
+
+/* ----------------------------------------------------
+   DEMO — Prefill: fill modal forms with a real Supabase customer
+---------------------------------------------------- */
+function initDemoPrefill() {
+  document.querySelectorAll('.demo-prefill').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const mode = btn.dataset.demoFill;
+      const label = btn.innerHTML;
+      btn.disabled = true;
+      btn.textContent = 'Loading demo profile…';
+
+      try {
+        const customer = await InventoryAPI.getDemoCustomer();
+        if (!customer) throw new Error('No demo customer available');
+
+        if (mode === 'account') {
+          const email = document.getElementById('account-email-input');
+          if (email) email.value = customer.email || '';
+        } else {
+          const fullName = [customer.first_name, customer.last_name].filter(Boolean).join(' ');
+          const nameEl = document.getElementById('customer-name');
+          const emailEl = document.getElementById('customer-email');
+          const phoneEl = document.getElementById('customer-phone');
+          if (nameEl) nameEl.value = fullName;
+          if (emailEl) emailEl.value = customer.email || '';
+          if (phoneEl) phoneEl.value = customer.phone || '';
+        }
+      } catch (err) {
+        console.warn('DEMO prefill failed:', err);
+        alert('Could not load a demo profile right now. Try again in a moment.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = label;
+      }
+    });
+  });
+}
 
 /* ----------------------------------------------------
    STEP 1 & 2: Search, Filter & Load Inventory (Home & Shop)
@@ -270,6 +309,18 @@ function startPickupAlertPolling(purchaseId) {
 /* ----------------------------------------------------
    STEP 5: Reader Loyalty Stamp Rendering (With 10/10 Celebration)
 ---------------------------------------------------- */
+// Renders 10 stamp slots into any grid element, filling up to earnedCount.
+function fillStampSlots(gridEl, earnedCount = 0) {
+  if (!gridEl) return;
+  gridEl.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const slot = document.createElement('div');
+    slot.className = `stamp-slot ${i <= earnedCount ? 'earned' : ''}`;
+    slot.innerHTML = i <= earnedCount ? '✓' : i;
+    gridEl.appendChild(slot);
+  }
+}
+
 function renderLoyaltyGrid(earnedCount = 0) {
   const grid = document.getElementById('stamp-grid');
   if (!grid) return;
@@ -298,13 +349,7 @@ function renderLoyaltyGrid(earnedCount = 0) {
     if (banner) banner.remove();
   }
 
-  grid.innerHTML = '';
-  for (let i = 1; i <= 10; i++) {
-    const slot = document.createElement('div');
-    slot.className = `stamp-slot ${i <= earnedCount ? 'earned' : ''}`;
-    slot.innerHTML = i <= earnedCount ? '✓' : i;
-    grid.appendChild(slot);
-  }
+  fillStampSlots(grid, earnedCount);
 
   const progressText = document.getElementById('loyalty-progress-text');
   const navBadgeText = document.getElementById('nav-stamp-count');
@@ -548,9 +593,14 @@ function initNavbarActions() {
 
   cartBtn?.addEventListener('click', (e) => {
     e.preventDefault();
-    const currentStamps = document.getElementById('nav-stamp-count')?.innerText || '0';
+    const currentStamps = parseInt(document.getElementById('nav-stamp-count')?.innerText, 10) || 0;
     const progressEl = document.getElementById('stamps-modal-progress');
     if (progressEl) progressEl.innerText = `${currentStamps} / 10 stamps earned`;
+
+    const modalGrid = document.getElementById('stamps-modal-grid');
+    fillStampSlots(modalGrid, currentStamps);
+    modalGrid?.classList.toggle('reward-unlocked', currentStamps >= 10);
+
     stampsModal?.classList.remove('hidden');
   });
 }

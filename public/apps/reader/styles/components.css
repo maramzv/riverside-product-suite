@@ -361,6 +361,19 @@
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
 
+/* Condensed stamp grid for the Riverside Stamps summary modal */
+.stamp-grid-container--compact {
+  margin: 0.9rem 0 0;
+  padding: 0.9rem;
+  max-width: none;
+  gap: 0.5rem;
+  border: 1px solid #eee;
+}
+
+.stamp-grid-container--compact .stamp-slot {
+  font-size: 0.8rem;
+}
+
 .stamp-slot {
   aspect-ratio: 1;
   border-radius: 50%;
@@ -553,6 +566,37 @@
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
   line-height: 1.4;
+}
+
+/* Inline demo helper link inside modals */
+.demo-prefill {
+  display: inline-block;
+  margin: -0.75rem 0 1.25rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-orange);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.demo-prefill:hover {
+  color: #b3541f;
+}
+
+.demo-prefill:disabled {
+  opacity: 0.6;
+  cursor: progress;
+  text-decoration: none;
+}
+
+#reserve-modal .demo-prefill {
+  margin-top: 0.25rem;
 }
 
 .form-group {
