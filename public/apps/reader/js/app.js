@@ -311,6 +311,9 @@ function renderLoyaltyGrid(earnedCount = 0) {
 
   if (progressText) progressText.innerText = earnedCount >= 10 ? '✨ 10 / 10 Completed!' : `${earnedCount} / 10 Stamps collected`;
   if (navBadgeText) navBadgeText.innerText = earnedCount;
+
+  // Light up the navbar star once the card is full.
+  document.getElementById('cart-link')?.classList.toggle('stamps-complete', earnedCount >= 10);
 }
 
 /* ----------------------------------------------------
@@ -538,9 +541,16 @@ function initNavbarActions() {
     renderLoyaltyGrid(0);
   });
 
+  const stampsModal = document.getElementById('stamps-modal');
+  const closeStampsModal = () => stampsModal?.classList.add('hidden');
+  document.getElementById('close-stamps-modal')?.addEventListener('click', closeStampsModal);
+  document.getElementById('stamps-modal-close-btn')?.addEventListener('click', closeStampsModal);
+
   cartBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     const currentStamps = document.getElementById('nav-stamp-count')?.innerText || '0';
-    alert(`Pre-Order & Pickup Cart Summary:\n- Active Status: Ready for counter verification\n- Rewards Progress: ${currentStamps} stamps earned`);
+    const progressEl = document.getElementById('stamps-modal-progress');
+    if (progressEl) progressEl.innerText = `${currentStamps} / 10 stamps earned`;
+    stampsModal?.classList.remove('hidden');
   });
 }

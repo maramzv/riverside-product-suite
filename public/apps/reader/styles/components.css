@@ -861,3 +861,31 @@
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Navbar star lights up + glows when all 10 stamps are collected */
+.cart-link .nav-icon {
+  transition: fill 0.4s ease, stroke 0.4s ease;
+}
+
+.cart-link.stamps-complete .nav-icon {
+  fill: #f4b400;
+  stroke: #f4b400;
+  transform-origin: center;
+  animation: star-pop 0.5s ease-out, star-glow 1.6s ease-in-out 0.5s infinite alternate;
+}
+
+.cart-link.stamps-complete .cart-badge {
+  background: #f4b400;
+  color: #3d2f00;
+}
+
+@keyframes star-pop {
+  0% { transform: scale(1) rotate(0); }
+  60% { transform: scale(1.4) rotate(20deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes star-glow {
+  from { filter: drop-shadow(0 0 1px rgba(244, 180, 0, 0.5)); transform: scale(1); }
+  to { filter: drop-shadow(0 0 6px rgba(244, 180, 0, 0.95)); transform: scale(1.12); }
+}

@@ -245,6 +245,29 @@
     </div>
   </div>
 
+  <!-- RIVERSIDE STAMPS MODAL -->
+  <div id="stamps-modal" class="modal hidden">
+    <div class="modal-content account-modal-content">
+      <button class="close-btn" id="close-stamps-modal">&times;</button>
+      <h2>Riverside Stamps</h2>
+      <p class="modal-subtitle">Your pre-order pickup status and rewards progress.</p>
+
+      <div class="loyalty-status-box">
+        <h4>Pickup Status</h4>
+        <p class="stamp-summary-text">Ready for counter verification</p>
+      </div>
+
+      <div class="loyalty-status-box">
+        <h4>Rewards Progress</h4>
+        <p id="stamps-modal-progress" class="stamp-summary-text">0 / 10 stamps earned</p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="stamps-modal-close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Collapsible Sidebar JavaScript Controller -->
   <script>
     const sidebar = document.getElementById('app-sidebar');
