@@ -259,7 +259,18 @@ export const InventoryAPI = {
     if (purchasesError) throw purchasesError;
     if (!purchases || purchases.length === 0) return [];
 
-    const bookIds = [...new Set(purchases.map((p) => p.book_id).filter(Boolean))];
+    // Collapse duplicate reservation rows for the same book, keeping the most
+    // advanced status (Ready for Pickup beats Pending).
+    const rank = (s) => (String(s).toLowerCase().includes('ready') ? 2 : 1);
+    const byBook = new Map();
+    for (const p of purchases) {
+      const key = p.book_id || p.purchase_id;
+      const existing = byBook.get(key);
+      if (!existing || rank(p.status) > rank(existing.status)) byBook.set(key, p);
+    }
+    const deduped = [...byBook.values()];
+
+    const bookIds = [...new Set(deduped.map((p) => p.book_id).filter(Boolean))];
     let titlesById = {};
     if (bookIds.length > 0) {
       const { data: books, error: booksError } = await supabase
@@ -270,7 +281,7 @@ export const InventoryAPI = {
       titlesById = Object.fromEntries((books || []).map((b) => [b.book_id, b.title]));
     }
 
-    return purchases.map((p) => ({
+    return deduped.map((p) => ({
       book_title: titlesById[p.book_id] || p.book_id || 'Book reservation',
       quantity: p.quantity || 1,
       status: p.status === 'Ready' ? 'Ready for Pickup' : p.status,
