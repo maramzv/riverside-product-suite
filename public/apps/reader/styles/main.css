@@ -1,3 +1,14 @@
+/* Smooth cross-fade between Reader pages instead of a white flash
+   (Chrome/Edge; other browsers fall back to a normal navigation). */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+}
+
 /* =========================================
    VARIABLES & BASE
 ========================================= */

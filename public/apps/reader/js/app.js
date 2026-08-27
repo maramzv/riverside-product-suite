@@ -4,6 +4,16 @@ import { InventoryAPI } from './api.js';
 import { initSearch } from './search.js'; 
 
 let currentBooksCache = [];
+// Most recent shopper email we've seen (from a profile lookup or a reservation),
+// used to show their pending pre-orders in the Riverside Stamps summary modal.
+let lastKnownEmail = null;
+// Single source of truth for the stamp count shared by every surface:
+// the rewards card, the navbar star, the stamps modal and the account modal.
+let currentStampCount = 0;
+// The customer whose account is currently active in the demo. Holds a full
+// record (name/email/phone) when a demo profile is selected; null when only a
+// raw email was typed or nobody is signed in.
+let activeCustomer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof initSearch === 'function') {
@@ -28,12 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ----------------------------------------------------
-   DEMO — Prefill: fill modal forms with a real Supabase customer
+   DEMO — Prefill: load a real Supabase customer into the account modal
 ---------------------------------------------------- */
 function initDemoPrefill() {
   document.querySelectorAll('.demo-prefill').forEach((btn) => {
     btn.addEventListener('click', async () => {
-      const mode = btn.dataset.demoFill;
       const label = btn.innerHTML;
       btn.disabled = true;
       btn.textContent = 'Loading demo profile…';
@@ -41,19 +50,11 @@ function initDemoPrefill() {
       try {
         const customer = await InventoryAPI.getDemoCustomer();
         if (!customer) throw new Error('No demo customer available');
+        if (customer.email) lastKnownEmail = customer.email;
+        activeCustomer = customer;
 
-        if (mode === 'account') {
-          const email = document.getElementById('account-email-input');
-          if (email) email.value = customer.email || '';
-        } else {
-          const fullName = [customer.first_name, customer.last_name].filter(Boolean).join(' ');
-          const nameEl = document.getElementById('customer-name');
-          const emailEl = document.getElementById('customer-email');
-          const phoneEl = document.getElementById('customer-phone');
-          if (nameEl) nameEl.value = fullName;
-          if (emailEl) emailEl.value = customer.email || '';
-          if (phoneEl) phoneEl.value = customer.phone || '';
-        }
+        const email = document.getElementById('account-email-input');
+        if (email) email.value = customer.email || '';
       } catch (err) {
         console.warn('DEMO prefill failed:', err);
         alert('Could not load a demo profile right now. Try again in a moment.');
@@ -238,9 +239,22 @@ window.openReserveModal = function(title, isbn) {
   const modal = document.getElementById('reserve-modal');
   const titleEl = document.getElementById('modal-book-title');
   const isbnEl = document.getElementById('modal-isbn');
-  
+
   if (titleEl) titleEl.innerText = title;
   if (isbnEl) isbnEl.value = isbn;
+
+  // Prefill the contact fields from whichever account is active in the demo.
+  const nameEl = document.getElementById('customer-name');
+  const emailEl = document.getElementById('customer-email');
+  const phoneEl = document.getElementById('customer-phone');
+
+  if (lastKnownEmail && emailEl) emailEl.value = lastKnownEmail;
+  if (activeCustomer) {
+    const fullName = [activeCustomer.first_name, activeCustomer.last_name].filter(Boolean).join(' ');
+    if (nameEl) nameEl.value = fullName;
+    if (phoneEl) phoneEl.value = activeCustomer.phone || '';
+  }
+
   if (modal) modal.classList.remove('hidden');
 };
 
@@ -262,6 +276,8 @@ function initReservationForm() {
     const customerEmail = document.getElementById('customer-email').value;
     const customerPhone = document.getElementById('customer-phone').value;
     const quantity = parseInt(document.getElementById('reservation-quantity')?.value) || 1;
+
+    if (customerEmail) lastKnownEmail = customerEmail.trim();
 
     try {
       const book = await InventoryAPI.getBookByIsbn(isbn);
@@ -321,44 +337,79 @@ function fillStampSlots(gridEl, earnedCount = 0) {
   }
 }
 
+// Central stamp-count setter — updates every surface so all modules stay in sync.
 function renderLoyaltyGrid(earnedCount = 0) {
+  currentStampCount = earnedCount;
+  const unlocked = earnedCount >= 10;
+
+  // Home page rewards card (only present on index.html)
   const grid = document.getElementById('stamp-grid');
-  if (!grid) return;
+  if (grid) {
+    const container = grid.closest('.rewards-section');
+    let banner = container?.querySelector('.reward-banner');
 
-  const container = grid.closest('.rewards-section');
-  let banner = container?.querySelector('.reward-banner');
-
-  // Trigger celebration effects if 10/10 milestone is reached
-  if (earnedCount >= 10) {
-    grid.classList.add('reward-unlocked');
-    if (!banner && container) {
-      banner = document.createElement('div');
-      banner.className = 'reward-banner';
-      banner.innerHTML = `
-        🎉 <strong>REWARD UNLOCKED!</strong> Choose your 10/10 perk to redeem at the counter:
-        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; justify-content: center; flex-wrap: wrap;">
-          <button class="btn-dark btn-small" onclick="alert('Selected: Free Book! Show this screen at the register.')">Free Book</button>
-          <button class="btn-dark btn-small" onclick="alert('Selected: Exclusive Access! Show this screen at the register.')">Exclusive Access</button>
-          <button class="btn-dark btn-small" onclick="alert('Selected: Reading Accessories &amp; Keepsakes! Show this screen at the register.')">Keepsakes</button>
-        </div>
-      `;
-      container.insertBefore(banner, grid);
+    if (unlocked) {
+      grid.classList.add('reward-unlocked');
+      if (!banner && container) {
+        banner = document.createElement('div');
+        banner.className = 'reward-banner';
+        banner.innerHTML = `
+          🎉 <strong>REWARD UNLOCKED!</strong> Choose your 10/10 perk to redeem at the counter:
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; justify-content: center; flex-wrap: wrap;">
+            <button class="btn-dark btn-small" onclick="alert('Selected: Free Book! Show this screen at the register.')">Free Book</button>
+            <button class="btn-dark btn-small" onclick="alert('Selected: Exclusive Access! Show this screen at the register.')">Exclusive Access</button>
+            <button class="btn-dark btn-small" onclick="alert('Selected: Reading Accessories &amp; Keepsakes! Show this screen at the register.')">Keepsakes</button>
+          </div>
+        `;
+        container.insertBefore(banner, grid);
+      }
+    } else {
+      grid.classList.remove('reward-unlocked');
+      if (banner) banner.remove();
     }
-  } else {
-    grid.classList.remove('reward-unlocked');
-    if (banner) banner.remove();
+
+    fillStampSlots(grid, earnedCount);
+
+    const progressText = document.getElementById('loyalty-progress-text');
+    if (progressText) progressText.innerText = unlocked ? '✨ 10 / 10 Completed!' : `${earnedCount} / 10 Stamps collected`;
   }
 
-  fillStampSlots(grid, earnedCount);
-
-  const progressText = document.getElementById('loyalty-progress-text');
+  // Navbar star
   const navBadgeText = document.getElementById('nav-stamp-count');
-
-  if (progressText) progressText.innerText = earnedCount >= 10 ? '✨ 10 / 10 Completed!' : `${earnedCount} / 10 Stamps collected`;
   if (navBadgeText) navBadgeText.innerText = earnedCount;
+  document.getElementById('cart-link')?.classList.toggle('stamps-complete', unlocked);
 
-  // Light up the navbar star once the card is full.
-  document.getElementById('cart-link')?.classList.toggle('stamps-complete', earnedCount >= 10);
+  // Account modal loyalty line
+  const profileSummary = document.getElementById('profile-stamp-summary');
+  if (profileSummary) {
+    profileSummary.innerText = unlocked
+      ? '✨ 10 / 10 Stamps — reward unlocked!'
+      : `${earnedCount} / 10 Stamps collected towards your reward`;
+  }
+
+  // Stamps & Rewards modal
+  syncStampsModal(earnedCount);
+}
+
+// Updates the Riverside Stamps & Rewards modal to a given count.
+function syncStampsModal(count) {
+  const progressEl = document.getElementById('stamps-modal-progress');
+  if (progressEl) progressEl.innerText = `${count} / 10 stamps earned`;
+
+  const statusEl = document.getElementById('stamps-modal-status');
+  if (statusEl) {
+    if (count >= 10) {
+      statusEl.innerText = 'Reward ready — show this screen at the counter for verification.';
+    } else {
+      const left = 10 - count;
+      statusEl.innerText = `${left} more stamp${left === 1 ? '' : 's'} until your next reward.`;
+    }
+  }
+
+  // Widen the modal at 10/10 so the longer status line stays on one line.
+  document.getElementById('stamps-modal')?.classList.toggle('stamps-modal--unlocked', count >= 10);
+
+  renderStampHistory();
 }
 
 /* ----------------------------------------------------
@@ -366,12 +417,80 @@ function renderLoyaltyGrid(earnedCount = 0) {
 ---------------------------------------------------- */
 function initLoyaltyCheck() {
   const viewRewardsBtn = document.querySelector('.rewards-footer .btn-dark:not(#rewards-demo-btn)');
-  const accountModal = document.getElementById('account-modal');
-  
   if (viewRewardsBtn) {
-    viewRewardsBtn.addEventListener('click', () => {
-      accountModal?.classList.remove('hidden');
-    });
+    viewRewardsBtn.addEventListener('click', openStampsModal);
+  }
+}
+
+// Opens the Riverside Stamps & Rewards modal, synced to the current stamp count.
+function openStampsModal() {
+  const stampsModal = document.getElementById('stamps-modal');
+  if (!stampsModal) return;
+
+  syncStampsModal(currentStampCount);
+
+  stampsModal.classList.remove('hidden');
+}
+
+// Cached real purchase history so demo clicks don't re-hit Supabase.
+let stampHistoryCache = null; // { email, rows }
+
+function stampHistoryRow(dateValue, stamps) {
+  const d = dateValue ? new Date(dateValue) : null;
+  const dateLabel = d && !Number.isNaN(d.getTime()) ? d.toLocaleDateString() : 'Date unavailable';
+  const n = Number(stamps) || 1;
+  return `
+    <div class="stamp-history">
+      <span class="stamp-history__label">Book purchase &middot; ${dateLabel}</span>
+      <span class="stamp-history__badge">✦ ${n} stamp${n === 1 ? '' : 's'}</span>
+    </div>`;
+}
+
+// One placeholder row per current stamp, dated backwards from today.
+function renderPlaceholderStampHistory(box) {
+  if (currentStampCount <= 0) {
+    box.innerHTML = '<p class="stamp-summary-text">No stamps yet — every book you buy earns one.</p>';
+    return;
+  }
+  const today = new Date();
+  box.innerHTML = Array.from({ length: currentStampCount }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i * 4);
+    return stampHistoryRow(d, 1);
+  }).join('');
+}
+
+async function renderStampHistory() {
+  const box = document.getElementById('stamps-modal-history');
+  if (!box) return;
+
+  // Real history for this shopper, if we've already fetched it.
+  if (lastKnownEmail && stampHistoryCache?.email === lastKnownEmail) {
+    if (stampHistoryCache.rows.length) {
+      box.innerHTML = stampHistoryCache.rows.map((e) => stampHistoryRow(e.purchased_on, e.stamps)).join('');
+    } else {
+      renderPlaceholderStampHistory(box);
+    }
+    return;
+  }
+
+  if (!lastKnownEmail) {
+    renderPlaceholderStampHistory(box);
+    return;
+  }
+
+  box.innerHTML = '<p class="stamp-summary-text">Loading your stamp history…</p>';
+  try {
+    const history = await InventoryAPI.getStampHistoryByEmail(lastKnownEmail);
+    stampHistoryCache = { email: lastKnownEmail, rows: history };
+    if (history.length) {
+      box.innerHTML = history.map((e) => stampHistoryRow(e.purchased_on, e.stamps)).join('');
+    } else {
+      renderPlaceholderStampHistory(box);
+    }
+  } catch (err) {
+    console.warn('Could not load stamp history:', err);
+    renderPlaceholderStampHistory(box);
   }
 }
 
@@ -543,7 +662,6 @@ function initNavbarActions() {
   const accountLoginView = document.getElementById('account-login-view');
   const accountProfileView = document.getElementById('account-profile-view');
   const profileDisplayEmail = document.getElementById('profile-display-email');
-  const profileStampSummary = document.getElementById('profile-stamp-summary');
   const logoutBtn = document.getElementById('logout-account-btn');
 
   const closeAccountModal = () => accountModal?.classList.add('hidden');
@@ -563,16 +681,21 @@ function initNavbarActions() {
       const submitBtn = accountForm.querySelector('button[type="submit"]');
       submitBtn.innerText = "Loading...";
 
-      const points = await InventoryAPI.getCustomerLoyaltyPoints(emailInput);
-      
+      const customer = await InventoryAPI.getCustomerByEmail(emailInput);
+      lastKnownEmail = emailInput;
+      // Keep the full record if this email is a known customer (so the reserve
+      // form can prefill name/phone); null for a fresh, unrecognised email.
+      activeCustomer = customer;
+
       profileDisplayEmail.innerText = emailInput;
-      profileStampSummary.innerText = `${points} / 10 Stamps collected towards your reward`;
-      
-      renderLoyaltyGrid(points);
+      // renderLoyaltyGrid drives the loyalty line + every other stamp surface.
+      renderLoyaltyGrid(customer?.stamp_count ?? 0);
 
       accountLoginView.classList.add('hidden');
       accountProfileView.classList.remove('hidden');
       submitBtn.innerText = "View Profile";
+
+      renderAccountPreorders();
     } catch (err) {
       alert("Could not find an account associated with this email.");
       accountForm.querySelector('button[type="submit"]').innerText = "View Profile";
@@ -583,6 +706,9 @@ function initNavbarActions() {
     accountProfileView.classList.add('hidden');
     accountLoginView.classList.remove('hidden');
     document.getElementById('account-email-input').value = '';
+    lastKnownEmail = null;
+    activeCustomer = null;
+    stampHistoryCache = null;
     renderLoyaltyGrid(0);
   });
 
@@ -593,14 +719,47 @@ function initNavbarActions() {
 
   cartBtn?.addEventListener('click', (e) => {
     e.preventDefault();
-    const currentStamps = parseInt(document.getElementById('nav-stamp-count')?.innerText, 10) || 0;
-    const progressEl = document.getElementById('stamps-modal-progress');
-    if (progressEl) progressEl.innerText = `${currentStamps} / 10 stamps earned`;
-
-    const modalGrid = document.getElementById('stamps-modal-grid');
-    fillStampSlots(modalGrid, currentStamps);
-    modalGrid?.classList.toggle('reward-unlocked', currentStamps >= 10);
-
-    stampsModal?.classList.remove('hidden');
+    openStampsModal();
   });
+}
+
+async function renderAccountPreorders() {
+  const box = document.getElementById('account-preorders');
+  if (!box) return;
+
+  const emptyState = `
+    <p class="stamp-summary-text">You have no pre-orders yet — reserve a book and we'll set it aside for pickup.</p>
+    <a class="btn-dark btn-small account-preorders__cta" href="shop.html"
+       onclick="document.getElementById('account-modal').classList.add('hidden')">Browse book catalog</a>`;
+
+  if (!lastKnownEmail) {
+    box.innerHTML = emptyState;
+    return;
+  }
+
+  box.innerHTML = '<p class="stamp-summary-text">Checking your pre-orders…</p>';
+
+  try {
+    const orders = await InventoryAPI.getPendingPreordersByEmail(lastKnownEmail);
+    if (!orders.length) {
+      box.innerHTML = emptyState;
+      return;
+    }
+
+    box.innerHTML = orders.map((order) => {
+      const ready = order.status === 'Ready for Pickup';
+      const copies = order.quantity === 1 ? 'copy' : 'copies';
+      return `
+        <div class="modal-preorder">
+          <div class="modal-preorder__info">
+            <strong>${order.book_title}</strong>
+            <small>${order.quantity} ${copies}</small>
+          </div>
+          <span class="modal-preorder__status${ready ? ' modal-preorder__status--ready' : ''}">${order.status}</span>
+        </div>`;
+    }).join('');
+  } catch (err) {
+    console.warn('Could not load pickup status:', err);
+    box.innerHTML = '<p class="stamp-summary-text">Could not load pre-orders right now.</p>';
+  }
 }

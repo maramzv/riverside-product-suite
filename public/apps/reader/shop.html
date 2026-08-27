@@ -59,7 +59,7 @@
           <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span>Account</span>
         </a>
-        <a href="#" id="cart-link" class="nav-icon-link cart-link" title="Riverside Stamps">
+        <a href="#" id="cart-link" class="nav-icon-link cart-link" title="Riverside Stamps & Rewards">
           <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           <span class="cart-badge" id="nav-stamp-count">0</span>
         </a>
@@ -111,7 +111,6 @@
       <button id="close-modal-btn" class="close-btn">&times;</button>
       <h2>Reserve for Pickup</h2>
       <h3 id="modal-book-title"></h3>
-      <button type="button" class="demo-prefill" data-demo-fill="reserve">&#10022; DEMO &mdash; Prefill this form</button>
       
       <form id="reserve-form">
         <input type="hidden" id="modal-isbn" required>
@@ -166,6 +165,13 @@
           <p id="profile-stamp-summary" class="stamp-summary-text">0 / 10 Stamps collected</p>
         </div>
 
+        <div class="loyalty-status-box">
+          <h4>Pre-orders &amp; Pickup</h4>
+          <div id="account-preorders">
+            <p class="stamp-summary-text">You have no pre-orders yet.</p>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button type="button" id="logout-account-btn" class="btn-secondary">Switch Account</button>
         </div>
@@ -177,18 +183,20 @@
   <div id="stamps-modal" class="modal hidden">
     <div class="modal-content account-modal-content">
       <button class="close-btn" id="close-stamps-modal">&times;</button>
-      <h2>Riverside Stamps</h2>
-      <p class="modal-subtitle">Your pre-order pickup status and rewards progress.</p>
+      <h2>Riverside Stamps &amp; Rewards</h2>
+      <p class="modal-subtitle">Your reward progress and stamp history.</p>
 
       <div class="loyalty-status-box">
-        <h4>Pickup Status</h4>
-        <p class="stamp-summary-text">Ready for counter verification</p>
+        <h4>Active Status</h4>
+        <p id="stamps-modal-status" class="stamp-summary-text">Keep collecting stamps toward your reward.</p>
       </div>
 
       <div class="loyalty-status-box">
         <h4>Rewards Progress</h4>
         <p id="stamps-modal-progress" class="stamp-summary-text">0 / 10 stamps earned</p>
-        <div class="stamp-grid-container stamp-grid-container--compact" id="stamps-modal-grid"></div>
+        <div id="stamps-modal-history">
+          <p class="stamp-summary-text">No stamps yet — every book you buy earns one.</p>
+        </div>
       </div>
 
       <div class="modal-actions">

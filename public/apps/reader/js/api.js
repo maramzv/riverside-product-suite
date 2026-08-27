@@ -176,6 +176,23 @@ export const InventoryAPI = {
     }
   },
 
+  // Full customer record for a signed-in email, or null if we've never seen it.
+  async getCustomerByEmail(email) {
+    if (!supabase) throw new Error("Supabase client not initialized.");
+
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!cleanEmail) return null;
+
+    const { data, error } = await supabase
+      .from('Customers')
+      .select('customer_id, first_name, last_name, email, phone, stamp_count')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data || null;
+  },
+
   async getCustomerLoyaltyPoints(email) {
     if (!supabase) throw new Error("Supabase client not initialized.");
 
@@ -216,5 +233,94 @@ export const InventoryAPI = {
 
     if (error) throw error;
     return data;
+  },
+
+  // Pending / ready pre-orders for whichever email we know for the shopper.
+  async getPendingPreordersByEmail(email) {
+    if (!supabase) throw new Error("Supabase client not initialized.");
+
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!cleanEmail) return [];
+
+    const { data: customer, error: customerError } = await supabase
+      .from('Customers')
+      .select('customer_id')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (customerError) throw customerError;
+    if (!customer) return [];
+
+    const { data: purchases, error: purchasesError } = await supabase
+      .from('Purchases')
+      .select('purchase_id, book_id, quantity, status, purchased_on')
+      .eq('customer_id', customer.customer_id)
+      .eq('order_type', 'Pre-order')
+      .in('status', ['Pending', 'Ready', 'Ready for Pickup'])
+      .order('purchased_on', { ascending: false });
+
+    if (purchasesError) throw purchasesError;
+    if (!purchases || purchases.length === 0) return [];
+
+    const bookIds = [...new Set(purchases.map((p) => p.book_id).filter(Boolean))];
+    let titlesById = {};
+    if (bookIds.length > 0) {
+      const { data: books, error: booksError } = await supabase
+        .from('Books')
+        .select('book_id, title')
+        .in('book_id', bookIds);
+      if (booksError) throw booksError;
+      titlesById = Object.fromEntries((books || []).map((b) => [b.book_id, b.title]));
+    }
+
+    return purchases.map((p) => ({
+      book_title: titlesById[p.book_id] || p.book_id || 'Book reservation',
+      quantity: p.quantity || 1,
+      status: p.status === 'Ready' ? 'Ready for Pickup' : p.status,
+      purchased_on: p.purchased_on
+    }));
+  },
+
+  // Completed book PURCHASES for this customer and the stamps each earned, newest
+  // first. Pre-orders / reservations are excluded — a reserved book is not a
+  // purchase and must not show up as a stamp-earning event.
+  async getStampHistoryByEmail(email) {
+    if (!supabase) throw new Error("Supabase client not initialized.");
+
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!cleanEmail) return [];
+
+    const { data: customer, error: customerError } = await supabase
+      .from('Customers')
+      .select('customer_id')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (customerError) throw customerError;
+    if (!customer) return [];
+
+    const { data: purchases, error: purchasesError } = await supabase
+      .from('Purchases')
+      .select('purchase_id, quantity, points_earned, purchased_on, order_type, status')
+      .eq('customer_id', customer.customer_id)
+      .eq('purchase_type', 'Book')
+      .order('purchased_on', { ascending: false });
+
+    if (purchasesError) throw purchasesError;
+    if (!purchases || purchases.length === 0) return [];
+
+    const isReservation = (p) => {
+      const ot = (p.order_type || '').toLowerCase();
+      const st = (p.status || '').toLowerCase();
+      return ot.includes('pre-order') || ot.includes('preorder') || ot.includes('reserv')
+        || st.includes('pending') || st.includes('reserv') || st.includes('ready');
+    };
+
+    return purchases
+      .filter((p) => !isReservation(p))
+      .map((p) => ({
+        stamps: p.points_earned ?? p.quantity ?? 1,
+        purchased_on: p.purchased_on
+      }));
   }
 };
