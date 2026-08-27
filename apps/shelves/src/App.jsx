@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import './App.css'
 
@@ -11,6 +11,9 @@ function App() {
   const [books, setBooks] = useState([])
   const [inventory, setInventory] = useState([])
   const [purchases, setPurchases] = useState([])
+  const [customers, setCustomers] = useState([])
+  const [newPurchaseIds, setNewPurchaseIds] = useState(() => new Set())
+  const seenPurchaseIds = useRef(null)
   const [showLowStock, setShowLowStock] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 820)
   const [searchQuery, setSearchQuery] = useState('')
@@ -30,16 +33,37 @@ function App() {
     setLoading(true)
     setError('')
     try {
-      const [booksResult, inventoryResult, purchasesResult] = await Promise.all([
+      const [booksResult, inventoryResult, purchasesResult, customersResult] = await Promise.all([
         supabase.from('Books').select('*'),
         supabase.from('Inventory').select('*'),
         supabase.from('Purchases').select('*').eq('status', 'Pending').eq('order_type', 'Pre-order'),
+        supabase.from('Customers').select('customer_id, first_name, last_name, email, phone'),
       ])
-      const failed = booksResult.error || inventoryResult.error || purchasesResult.error
+      const failed = booksResult.error || inventoryResult.error || purchasesResult.error || customersResult.error
       if (failed) throw failed
       setBooks(booksResult.data ?? [])
       setInventory(inventoryResult.data ?? [])
-      setPurchases(purchasesResult.data ?? [])
+      setCustomers(customersResult.data ?? [])
+
+      const purchaseRows = purchasesResult.data ?? []
+      setPurchases(purchaseRows)
+
+      // Flash pre-orders that showed up since the last load (e.g. a Reader reservation).
+      const ids = new Set(purchaseRows.map((row) => row.purchase_id))
+      if (seenPurchaseIds.current) {
+        const fresh = [...ids].filter((id) => !seenPurchaseIds.current.has(id))
+        if (fresh.length) {
+          setNewPurchaseIds((prev) => new Set([...prev, ...fresh]))
+          fresh.forEach((id) => setTimeout(() => {
+            setNewPurchaseIds((prev) => {
+              const next = new Set(prev)
+              next.delete(id)
+              return next
+            })
+          }, 6000))
+        }
+      }
+      seenPurchaseIds.current = ids
     } catch (loadError) {
       setError(loadError.message ?? 'Unable to load shared data.')
     } finally {
@@ -57,6 +81,7 @@ function App() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'Books' }, loadData)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'Inventory' }, loadData)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'Purchases' }, loadData)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Customers' }, loadData)
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [])
@@ -81,11 +106,20 @@ function App() {
 
   const purchasesWithTitles = useMemo(() => {
     const booksById = Object.fromEntries(books.map((book) => [book.book_id, book]))
-    return purchases.map((purchase) => ({
-      ...purchase,
-      title: booksById[purchase.book_id ?? purchase.item_id]?.title ?? purchase.title ?? purchase.book_title,
-    }))
-  }, [books, purchases])
+    const customersById = Object.fromEntries(customers.map((customer) => [customer.customer_id, customer]))
+    return purchases.map((purchase) => {
+      const customer = customersById[purchase.customer_id]
+      const customerName = customer ? [customer.first_name, customer.last_name].filter(Boolean).join(' ').trim() : ''
+      return {
+        ...purchase,
+        title: booksById[purchase.book_id ?? purchase.item_id]?.title ?? purchase.title ?? purchase.book_title,
+        customerName,
+        customerEmail: customer?.email ?? '',
+        customerPhone: customer?.phone ?? '',
+        isNew: newPurchaseIds.has(purchase.purchase_id),
+      }
+    })
+  }, [books, purchases, customers, newPurchaseIds])
 
   async function markReady(purchaseId) {
     setUpdatingId(purchaseId)
@@ -184,7 +218,7 @@ function App() {
         <div className="section-heading"><div><p className="eyebrow">Inventory operations</p><h2>Stock levels</h2></div><div className="table-filters"><label className="search"><span>⌕</span><input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Scan ISBN or search title" aria-label="Scan ISBN or search title" autoComplete="off" /></label><select value={genreFilter} onChange={(event) => setGenreFilter(event.target.value)} aria-label="Filter by genre"><option value="all">All genres</option>{[...new Set(books.map((book) => book.genre).filter(Boolean))].sort().map((genre) => <option key={genre} value={genre}>{genre}</option>)}</select><label className="filter"><input type="checkbox" checked={showLowStock} onChange={(event) => setShowLowStock(event.target.checked)} /> Low stock only</label></div></div>
         <div className="table-wrap"><table><thead><tr><th>Book</th><th>On shelf</th><th>Threshold</th><th>Last order</th><th>Status</th><th>Adjust</th></tr></thead><tbody>{loading ? <tr><td colSpan="6" className="empty">Loading live inventory...</td></tr> : inventoryRows.length === 0 ? <tr><td colSpan="6" className="empty">No inventory matches this filter.</td></tr> : inventoryRows.map((row) => <tr key={row.book_id}><td><strong>{row.title}</strong><small>{books.find((book) => book.book_id === row.book_id)?.author ?? row.book_id}</small></td><td><span className={`quantity ${row.low ? 'low' : ''}`}>{row.qty_in_stock ?? 0}</span></td><td>{row.low_stock_threshold ?? 0}</td><td>{row.last_order_qty ?? 0} copies <small>{row.last_order_date ? new Date(row.last_order_date).toLocaleDateString() : 'No date'}</small></td><td>{row.status === 'Reordered' ? <><span className="status-badge reordered">Reordered</span><button className="reorder" disabled={updatingId === `reorder-${row.book_id}`} onClick={() => handleReorder(row.book_id)}>{updatingId === `reorder-${row.book_id}` ? 'Saving...' : 'Request again'}</button></> : row.status === 'Needs Reorder' ? <button className="reorder" disabled={updatingId === `reorder-${row.book_id}`} onClick={() => handleReorder(row.book_id)}>{updatingId === `reorder-${row.book_id}` ? 'Saving...' : 'Needs reorder'}</button> : <span className={`status-badge ${row.low ? 'low-status' : 'in-stock'}`}>{row.status}</span>}</td><td><div className="adjust"><button aria-label={`Decrease ${row.title} stock`} disabled={updatingId === row.book_id} onClick={() => adjustStock(row.book_id, row.qty_in_stock, -1)}>-</button><button aria-label={`Increase ${row.title} stock`} disabled={updatingId === row.book_id} onClick={() => adjustStock(row.book_id, row.qty_in_stock, 1)}>+</button></div></td></tr>)}</tbody></table></div>
       </section>}
-      {activeTab === 'fulfillment' && <section className="workspace pickup" id="pre-orders"><div className="section-heading"><div><p className="eyebrow">Fulfillment queue</p><h2>Pre-orders to pull</h2></div><span className="count-pill">{purchases.length} pending</span></div><div className="orders">{loading ? <p className="empty">Loading pickup queue...</p> : purchases.length === 0 ? <p className="empty">No pending pre-orders right now.</p> : purchasesWithTitles.map((purchase) => <article className="order" key={purchase.purchase_id}><div className="order-icon">{String(purchase.quantity ?? 1).padStart(2, '0')}</div><div className="order-info"><strong>{purchase.title ?? purchase.item_id ?? purchase.book_id ?? 'Book order'}</strong><span>Order {purchase.purchase_id} · Customer {purchase.customer_id ?? 'name unavailable'} · {purchase.quantity ?? 1} copy{purchase.quantity === 1 ? '' : 'ies'}</span><small>{purchase.date ? new Date(purchase.date).toLocaleDateString() : 'Date unavailable'}</small></div><button className="ready" disabled={updatingId === purchase.purchase_id} onClick={() => markReady(purchase.purchase_id)}>{updatingId === purchase.purchase_id ? 'Updating...' : 'Mark ready for pickup'}</button></article>)}</div></section>}
+      {activeTab === 'fulfillment' && <section className="workspace pickup" id="pre-orders"><div className="section-heading"><div><p className="eyebrow">Fulfillment queue</p><h2>Pre-orders to pull</h2></div><span className="count-pill">{purchases.length} pending</span></div><div className="orders">{loading ? <p className="empty">Loading pickup queue...</p> : purchases.length === 0 ? <p className="empty">No pending pre-orders right now.</p> : purchasesWithTitles.map((purchase) => { const orderDate = purchase.purchased_on ?? purchase.date; return <article className={`order${purchase.isNew ? ' order--new' : ''}`} key={purchase.purchase_id}><div className="order-icon">{String(purchase.quantity ?? 1).padStart(2, '0')}</div><div className="order-info"><strong>{purchase.title ?? purchase.item_id ?? purchase.book_id ?? 'Book order'}{purchase.isNew && <span className="order-new-badge">New</span>}</strong><span>{purchase.customerName || 'Walk-in customer'}{purchase.customerEmail ? ` · ${purchase.customerEmail}` : ''} · {purchase.quantity ?? 1} copy{purchase.quantity === 1 ? '' : 'ies'}</span><small>{purchase.customerPhone ? `${purchase.customerPhone} · ` : ''}{orderDate ? new Date(orderDate).toLocaleDateString() : 'Date unavailable'} · Order {purchase.purchase_id}</small></div><button className="ready" disabled={updatingId === purchase.purchase_id} onClick={() => markReady(purchase.purchase_id)}>{updatingId === purchase.purchase_id ? 'Updating...' : 'Mark ready for pickup'}</button></article> })}</div></section>}
       {activeTab === 'receiving' && <section className="workspace receiving"><div className="section-heading"><div><p className="eyebrow">Stock inward</p><h2>Receive a shipment</h2></div></div><form className="receiving-form" onSubmit={receiveShipment}><label>Book<select required value={receivingBookId} onChange={(event) => setReceivingBookId(event.target.value)}><option value="">Choose a title</option>{books.map((book) => <option key={book.book_id} value={book.book_id}>{book.title} ({book.book_id})</option>)}</select></label><label>Copies received<input required min="1" type="number" value={receivingQuantity} onChange={(event) => setReceivingQuantity(event.target.value)} placeholder="e.g. 12" /></label><label>Low-stock threshold<input min="0" type="number" value={receivingThreshold} onChange={(event) => setReceivingThreshold(event.target.value)} placeholder="Leave unchanged" /></label><button className="ready" disabled={updatingId.startsWith('receive-')} type="submit">{updatingId.startsWith('receive-') ? 'Saving...' : 'Add shipment to stock'}</button></form></section>}
       {activeTab === 'activity' && <section className="activity-panel full-panel"><div><p className="eyebrow">Session activity</p><h2>Recent actions</h2></div>{activity.length === 0 ? <p className="empty">Your actions will appear here during this session.</p> : <div className="activity-list">{activity.map((entry) => <div key={entry.id}><span className="activity-dot" /><strong>{entry.text}</strong><small>{entry.time}</small></div>)}</div>}</section>}
       {activeTab === 'reports' && <section className="workspace reports"><div className="section-heading"><div><p className="eyebrow">Reordering</p><h2>Reports & reorder history</h2></div><button className="ready" onClick={exportReorderReport}>Export reorder CSV</button></div><div className="report-list">{inventoryRows.filter((row) => row.needs_reorder || row.status === 'Needs Reorder').map((row) => <div key={row.book_id}><strong>{row.title}</strong><span>{row.qty_in_stock ?? 0} on shelf · reorder {row.reorder_qty ?? 'quantity TBD'}</span></div>)}{inventoryRows.filter((row) => row.needs_reorder || row.status === 'Needs Reorder').length === 0 && <p className="empty">No titles currently need reordering.</p>}</div></section>}
