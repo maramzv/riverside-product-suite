@@ -217,18 +217,15 @@ export const InventoryAPI = {
     }
   },
 
-  // Demo helper: returns one random customer from a curated, known-good set so
-  // the "DEMO — Prefill" links can populate the forms with real Supabase data.
+  // Demo helper: returns the single demo customer (Freya Achebe) so the
+  // "DEMO — Prefill" link always loads the same known-good Supabase account.
   async getDemoCustomer() {
     if (!supabase) throw new Error("Supabase client not initialized.");
-
-    const DEMO_CUSTOMER_IDS = ['CUST-010', 'CUST-025', 'CUST-024'];
-    const pick = DEMO_CUSTOMER_IDS[Math.floor(Math.random() * DEMO_CUSTOMER_IDS.length)];
 
     const { data, error } = await supabase
       .from('Customers')
       .select('customer_id, first_name, last_name, email, phone, stamp_count')
-      .eq('customer_id', pick)
+      .eq('customer_id', 'CUST-025')
       .maybeSingle();
 
     if (error) throw error;
