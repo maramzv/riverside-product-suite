@@ -341,6 +341,13 @@
   border: 1px solid #d5dad0;
 }
 
+/* Row 2 of .dashboard-grid: let each column keep its own height so the 10/10
+   reward banner growing the rewards card doesn't stretch the row and shift the page. */
+.inventory-section,
+.rewards-section {
+  align-self: start;
+}
+
 /* Stamp Grid: Strict 5x2 layout */
 .stamp-grid-container {
   display: grid;

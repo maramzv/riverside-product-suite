@@ -117,7 +117,7 @@ h1, h2, h3, h4 {
 ========================================= */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2.4fr 1fr; /* Controls the Left vs Right width ratio */
+  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr); /* Locked ratio — tracks ignore content min-width so the rewards card never widens */
   gap: 1.5rem;
   padding: 2rem 3rem;
   max-width: 1600px;
