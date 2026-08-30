@@ -10,3 +10,7 @@ public/apps/shelves
 
 .vercel
 .env*
+
+# Claude Code chat transcripts (local records only)
+docs/transcripts/claude-chats/
+.claude/save-chat-state.json

@@ -177,11 +177,10 @@
       address: "428 Riverfront Place, Suite 100, Portland, OR 97201",
       phone: "(503) 555-0192",
       email: "hello@riversidebooks.com",
-      hours: "Monday-Saturday: 10:00 AM-6:00 PM; Sunday: 11:00 AM-4:00 PM.",
+      hours: "Monday-Friday: 10:00 AM-6:00 PM; Saturday: 10:00 AM-6:00 PM; Sunday: 11:00 AM-4:00 PM.",
       return_policy: "Unopened books and gifts may be returned with a receipt within 14 days for store credit or a refund to the original payment method.",
       exchange_policy: "Items may be exchanged within 14 days with a receipt. Exchanges for a different title are subject to current stock availability.",
-      reward_rule: "Earn one stamp for each completed purchase. Collect 10 stamps to receive 15% off one regularly priced book.",
-      birthday_discount_rule: "Rewards members receive 15% off one regularly priced book during their birthday month.",
+      reward_rule: "Earn one stamp with every book purchase. Fill your 10-stamp card and pick a reward at the counter: a free book, exclusive access, or a keepsake.",
       about_text: "Riverside Books is an independent neighborhood bookstore on the riverfront. We carry new books, thoughtful gifts, and host friendly literary gatherings."
     };
 
@@ -564,7 +563,7 @@
       },
       {
         name: "get_rewards_info",
-        description: "Get details on the Riverside Readers reward program points and birthday discount rules.",
+        description: "Get details on the Riverside Readers stamp-card reward program.",
         parameters: { type: "OBJECT", properties: {} }
       },
       {
@@ -936,10 +935,7 @@
 
           case "get_rewards_info": {
             const storeInfo = getStoreInfo();
-            return {
-              reward_rule: storeInfo.reward_rule,
-              birthday_discount_rule: storeInfo.birthday_discount_rule
-            };
+            return { reward_rule: storeInfo.reward_rule };
           }
 
           case "get_available_genres": {
@@ -1308,7 +1304,7 @@
         toolName = "get_store_hours";
       } else if (input.includes("return") || input.includes("exchange") || input.includes("policy") || input.includes("refund")) {
         toolName = "get_return_policy";
-      } else if (input.includes("reward") || input.includes("point") || input.includes("birthday") || input.includes("membership") || input.includes("discount")) {
+      } else if (input.includes("reward") || input.includes("stamp") || input.includes("membership") || input.includes("loyalty")) {
         toolName = "get_rewards_info";
       } else if (input.includes("genres") || input.includes("categories") || input.includes("what kinds of books") || input.includes("kinds of books do you") || /\bwhat genre(s)? do you\b/i.test(input)) {
         toolName = "get_available_genres";
@@ -1503,7 +1499,7 @@
       } else if (toolName === "get_return_policy") {
         responseText = `Here is our return and exchange policy:\n\n• **Returns:** ${dbData.return_policy}\n• **Exchanges:** ${dbData.exchange_policy}`;
       } else if (toolName === "get_rewards_info") {
-        responseText = `With our **Riverside Readers** program:\n\n• **Points:** ${dbData.reward_rule}\n• **Birthday Perk:** ${dbData.birthday_discount_rule}`;
+        responseText = `Here's how our **Riverside Readers** program works:\n\n${dbData.reward_rule}`;
       } else if (toolName === "get_upcoming_events") {
         const evList = dbData.upcoming_events.map(e => {
           const priceLine = (typeof e.ticket_price === 'number')
