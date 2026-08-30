@@ -7,6 +7,21 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1bHlscHl3dGRnb3hhbXdseGx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNTgyMjYsImV4cCI6MjEwMjczNDIyNn0.6usgf9zXJ3ewsRrklNPBX1ByrAPybWsd2UGc2BPg_-I',
 )
 
+// "428 Riverfront Place, Suite 100, Portland, OR 97201" -> ["428 Riverfront Place, Suite 100", "Portland, OR 97201"]
+function addressLines(address) {
+  const parts = String(address || '').split(',').map((s) => s.trim()).filter(Boolean)
+  if (parts.length <= 2) return parts.length ? [parts.join(', ')] : []
+  return [parts.slice(0, -2).join(', '), parts.slice(-2).join(', ')]
+}
+
+// "Monday-Friday: 10:00 AM-6:00 PM; Saturday: ..." -> [{ days, time }, ...]
+function hoursLines(hoursStr) {
+  return String(hoursStr || '').replace(/\.\s*$/, '').split(';').map((s) => s.trim()).filter(Boolean).map((seg) => {
+    const i = seg.indexOf(':')
+    return i === -1 ? { days: seg, time: '' } : { days: seg.slice(0, i).trim(), time: seg.slice(i + 1).trim() }
+  })
+}
+
 function App() {
   const [books, setBooks] = useState([])
   const [inventory, setInventory] = useState([])
@@ -28,22 +43,25 @@ function App() {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [updatingId, setUpdatingId] = useState('')
+  const [storeInfo, setStoreInfo] = useState(null)
 
   async function loadData() {
     setLoading(true)
     setError('')
     try {
-      const [booksResult, inventoryResult, purchasesResult, customersResult] = await Promise.all([
+      const [booksResult, inventoryResult, purchasesResult, customersResult, storeInfoResult] = await Promise.all([
         supabase.from('Books').select('*'),
         supabase.from('Inventory').select('*'),
         supabase.from('Purchases').select('*').eq('status', 'Pending').eq('order_type', 'Pre-order'),
         supabase.from('Customers').select('customer_id, first_name, last_name, email, phone'),
+        supabase.from('Store Info').select('*').limit(1).maybeSingle(),
       ])
       const failed = booksResult.error || inventoryResult.error || purchasesResult.error || customersResult.error
       if (failed) throw failed
       setBooks(booksResult.data ?? [])
       setInventory(inventoryResult.data ?? [])
       setCustomers(customersResult.data ?? [])
+      if (!storeInfoResult.error && storeInfoResult.data) setStoreInfo(storeInfoResult.data)
 
       const purchaseRows = purchasesResult.data ?? []
       setPurchases(purchaseRows)
@@ -222,7 +240,7 @@ function App() {
       {activeTab === 'receiving' && <section className="workspace receiving"><div className="section-heading"><div><p className="eyebrow">Stock inward</p><h2>Receive a shipment</h2></div></div><form className="receiving-form" onSubmit={receiveShipment}><label>Book<select required value={receivingBookId} onChange={(event) => setReceivingBookId(event.target.value)}><option value="">Choose a title</option>{books.map((book) => <option key={book.book_id} value={book.book_id}>{book.title} ({book.book_id})</option>)}</select></label><label>Copies received<input required min="1" type="number" value={receivingQuantity} onChange={(event) => setReceivingQuantity(event.target.value)} placeholder="e.g. 12" /></label><label>Low-stock threshold<input min="0" type="number" value={receivingThreshold} onChange={(event) => setReceivingThreshold(event.target.value)} placeholder="Leave unchanged" /></label><button className="ready" disabled={updatingId.startsWith('receive-')} type="submit">{updatingId.startsWith('receive-') ? 'Saving...' : 'Add shipment to stock'}</button></form></section>}
       {activeTab === 'activity' && <section className="activity-panel full-panel"><div><p className="eyebrow">Session activity</p><h2>Recent actions</h2></div>{activity.length === 0 ? <p className="empty">Your actions will appear here during this session.</p> : <div className="activity-list">{activity.map((entry) => <div key={entry.id}><span className="activity-dot" /><strong>{entry.text}</strong><small>{entry.time}</small></div>)}</div>}</section>}
       {activeTab === 'reports' && <section className="workspace reports"><div className="section-heading"><div><p className="eyebrow">Reordering</p><h2>Reports & reorder history</h2></div><button className="ready" onClick={exportReorderReport}>Export reorder CSV</button></div><div className="report-list">{inventoryRows.filter((row) => row.needs_reorder || row.status === 'Needs Reorder').map((row) => <div key={row.book_id}><strong>{row.title}</strong><span>{row.qty_in_stock ?? 0} on shelf · reorder {row.reorder_qty ?? 'quantity TBD'}</span></div>)}{inventoryRows.filter((row) => row.needs_reorder || row.status === 'Needs Reorder').length === 0 && <p className="empty">No titles currently need reordering.</p>}</div></section>}
-      <section className="about" id="about"><div><p className="eyebrow">About Riverside Books</p><h2>A neighborhood bookstore by the river.</h2><p>Riverside Books is an independent neighborhood bookstore located along the riverfront in Portland, Oregon. We specialize in new books, thoughtful gifts, and hosting friendly literary gatherings for our community.</p></div><address className="contact-box"><h3 className="contact-heading">Our Location & Contact Info</h3><p className="contact-address">428 Riverfront Place, Suite 100<br />Portland, OR 97201</p><p className="contact-phone">(503) 555-0192</p><a href="mailto:staff@riversidebooks.com" className="contact-email">staff@riversidebooks.com</a><a href="mailto:staff@riversidebooks.com?subject=Staff%20Inquiry" className="staff-contact">Ask a Staff Member</a></address></section>
+      <section className="about" id="about"><div><p className="eyebrow">About {storeInfo?.store_name ?? 'Riverside Books'}</p><h2>A neighborhood bookstore by the river.</h2><p>{storeInfo?.about_text ?? 'Riverside Books is an independent neighborhood bookstore located along the riverfront in Portland, Oregon. We specialize in new books, thoughtful gifts, and hosting friendly literary gatherings for our community.'}</p></div><address className="contact-box"><h3 className="contact-heading">Location &amp; Contact Info</h3><div className="contact-group"><p className="contact-address">{addressLines(storeInfo?.address ?? '428 Riverfront Place, Suite 100, Portland, OR 97201').map((line, i) => <span key={i}>{line}</span>)}</p><div className="contact-hours"><span className="contact-hours-label">Store hours</span>{hoursLines(storeInfo?.hours ?? 'Monday-Friday: 10:00 AM-6:00 PM; Saturday: 10:00 AM-6:00 PM; Sunday: 11:00 AM-4:00 PM.').map((h, i) => <span key={i} className="contact-hours-row"><strong>{h.days}</strong> {h.time}</span>)}</div></div><div className="contact-group"><p className="contact-phone">{storeInfo?.phone ?? '(503) 555-0192'}</p><a href={`mailto:${storeInfo?.staff_email ?? 'staff@riversidebooks.com'}`} className="contact-email">{storeInfo?.staff_email ?? 'staff@riversidebooks.com'}</a><a href={`mailto:${storeInfo?.staff_email ?? 'staff@riversidebooks.com'}?subject=Staff%20Inquiry`} className="staff-contact">Ask a Staff Member</a></div></address></section>
       <footer id="settings"><div><span className="brand-mark"><i /></span><b>Riverside Books</b></div><a href="#inventory" onClick={showInventory}>Inventory Management</a><button type="button" onClick={scrollToAbout}>About & Contact</button></footer>
       </main>
     </div>

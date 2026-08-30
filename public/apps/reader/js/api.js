@@ -193,6 +193,21 @@ export const InventoryAPI = {
     return data || null;
   },
 
+  // Central store info (hours, policies, contact) — one row, id 1.
+  async getStoreInfo() {
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from('Store Info')
+      .select('*')
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      console.warn('store_info fetch failed:', error.message);
+      return null;
+    }
+    return data;
+  },
+
   async getCustomerLoyaltyPoints(email) {
     if (!supabase) throw new Error("Supabase client not initialized.");
 

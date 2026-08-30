@@ -169,8 +169,10 @@
     const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1bHlscHl3dGRnb3hhbXdseGx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNTgyMjYsImV4cCI6MjEwMjczNDIyNn0.6usgf9zXJ3ewsRrklNPBX1ByrAPybWsd2UGc2BPg_-I";
     const SUPABASE_PROJECT_REF = "wulylpywtdgoxamwlxlu";
 
-    // Store info from CSV data (since table doesn't exist in Supabase)
-    const STORE_INFO = {
+    // Central store info. Defaults below double as the offline fallback; the
+    // real values are loaded from the shared `store_info` Supabase table on
+    // startup (see loadStoreInfo).
+    let STORE_INFO = {
       store_name: "Riverside Books",
       address: "428 Riverfront Place, Suite 100, Portland, OR 97201",
       phone: "(503) 555-0192",
@@ -185,6 +187,84 @@
 
     function getStoreInfo() {
       return STORE_INFO;
+    }
+
+    async function loadStoreInfo() {
+      try {
+        const rows = await fetchFromSupabase('Store Info');
+        if (rows && rows[0]) {
+          STORE_INFO = { ...STORE_INFO, ...rows[0] };
+        }
+      } catch (error) {
+        console.warn('Store Info load failed, using defaults:', error.message);
+      }
+      return STORE_INFO;
+    }
+
+    // Turns the central hours string ("Monday-Saturday: 10:00 AM-6:00 PM; Sunday:
+    // 11:00 AM-4:00 PM.") into a live "Open today 'til 6 PM" style label.
+    const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    function parseClock(str) {
+      const m = String(str).trim().match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+      if (!m) return null;
+      let h = Number(m[1]) % 12;
+      if (/PM/i.test(m[3])) h += 12;
+      return h * 60 + Number(m[2]);
+    }
+
+    // Hours for a given weekday index, or null if the store is closed that day.
+    function hoursForDay(hoursStr, dayIdx) {
+      const dayName = WEEKDAYS[dayIdx];
+      for (const seg of hoursStr.replace(/\.\s*$/, '').split(';').map((s) => s.trim())) {
+        const ci = seg.indexOf(':');
+        if (ci === -1) continue;
+        const dayPart = seg.slice(0, ci).trim();
+        const timePart = seg.slice(ci + 1).trim();
+
+        let covers = false;
+        if (dayPart.includes('-')) {
+          const [a, b] = dayPart.split('-').map((x) => WEEKDAYS.indexOf(x.trim()));
+          if (a !== -1 && b !== -1) covers = a <= b ? (dayIdx >= a && dayIdx <= b) : (dayIdx >= a || dayIdx <= b);
+        } else {
+          covers = dayPart.split(/,\s*/).map((x) => x.trim()).includes(dayName);
+        }
+        if (!covers) continue;
+
+        const tm = timePart.match(/(.+?(?:AM|PM))\s*-\s*(.+?(?:AM|PM))/i);
+        if (!tm) return { openLabel: timePart, closeLabel: timePart, openMin: null, closeMin: null };
+        return {
+          openMin: parseClock(tm[1]),
+          closeMin: parseClock(tm[2]),
+          openLabel: tm[1].trim().replace(':00', ''),
+          closeLabel: tm[2].trim().replace(':00', ''),
+        };
+      }
+      return null;
+    }
+
+    function describeTodayHours(hoursStr) {
+      if (!hoursStr) return 'Ask about hours, stock & events';
+      const now = new Date();
+      const todayIdx = now.getDay();
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      const today = hoursForDay(hoursStr, todayIdx);
+
+      if (today && today.openMin != null && nowMin < today.openMin) {
+        return `Closed · opens ${today.openLabel} today`;
+      }
+      if (today && (today.closeMin == null || nowMin < today.closeMin)) {
+        return `Open 'til ${today.closeLabel} today`;
+      }
+      // Closed for the day — point at the next day the store opens.
+      for (let i = 1; i <= 7; i++) {
+        const next = hoursForDay(hoursStr, (todayIdx + i) % 7);
+        if (next) {
+          const when = i === 1 ? 'tomorrow' : WEEKDAYS[(todayIdx + i) % 7];
+          return `Closed · opens ${next.openLabel} ${when}`;
+        }
+      }
+      return 'Closed';
     }
 
     // Helper function to get available genres from books table
@@ -229,7 +309,7 @@
       }
       
       for (const tableName of tableNames) {
-        let url = `${SUPABASE_URL}/rest/v1/${tableName}?select=${select}`;
+        let url = `${SUPABASE_URL}/rest/v1/${encodeURIComponent(tableName)}?select=${select}`;
         
         // Add filters
         Object.entries(filters).forEach(([key, value]) => {
@@ -1578,6 +1658,7 @@ CRITICAL: When a customer asks to hold, reserve, or pre-order a book (especially
       const [isExamplesModalOpen, setIsExamplesModalOpen] = React.useState(false);
       const [activeDbTab, setActiveDbTab] = React.useState('books');
       const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+      const [todayHoursLabel, setTodayHoursLabel] = React.useState(() => describeTodayHours(STORE_INFO.hours));
       
       // DB Explorer data state
       const [dbBooks, setDbBooks] = React.useState([]);
@@ -1600,6 +1681,7 @@ CRITICAL: When a customer asks to hold, reserve, or pre-order a book (especially
 
       // Test API connection on mount
       React.useEffect(() => {
+        loadStoreInfo().then((info) => setTodayHoursLabel(describeTodayHours(info.hours)));
         async function testConnection() {
           try {
             console.log('[Connection Test] Testing Supabase connection without limit...');
@@ -1906,7 +1988,7 @@ CRITICAL: When a customer asks to hold, reserve, or pre-order a book (especially
               <div>
                 <p className="font-body text-xs text-accent flex items-center gap-1.5 font-medium">
                   <span className="w-2 h-2 rounded-full bg-teal inline-block animate-pulse"></span>
-                  Customer Support Chatbot • Open Today 'til 8 PM
+                  Customer Support Chatbot • {todayHoursLabel}
                 </p>
               </div>
             </div>

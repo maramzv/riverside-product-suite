@@ -39,3 +39,15 @@ footer { display: flex; flex-wrap: wrap; align-items: center; gap: 21px; padding
   15% { background: rgba(45, 106, 111, .16); box-shadow: inset 3px 0 0 var(--color-teal, #2d6a6f); }
   100% { background: transparent; box-shadow: inset 3px 0 0 transparent; }
 }
+
+/* Contact box: heading, then one blank-line gap before each block */
+.about address { gap: 1.05rem; }
+.about address p { margin: 0; }
+.about address .contact-heading { margin: 0; color: var(--color-primary); font-family: var(--font-heading); font-size: 18px; font-weight: 600; }
+.contact-group { display: grid; gap: 2px; }
+.contact-address span { display: block; }
+.contact-hours { display: grid; gap: 2px; margin-top: 8px; }
+.contact-hours-label { color: var(--color-primary); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-size: 10px; margin-bottom: 1px; }
+.contact-hours-row { font-size: 12px; }
+.about address .contact-hours strong { color: var(--color-accent); font-family: inherit; font-size: 12px; font-weight: 600; }
+.about address .contact-group .staff-contact { margin-top: 6px; }

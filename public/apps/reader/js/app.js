@@ -35,7 +35,51 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initNavbarActions();
   initDemoPrefill();
+  initStoreHours();
 });
+
+/* ----------------------------------------------------
+   Store hours + location — rendered from the central "Store Info" table
+---------------------------------------------------- */
+const STORE_INFO_FALLBACK = {
+  hours: 'Monday-Saturday: 10:00 AM-6:00 PM; Sunday: 11:00 AM-4:00 PM.',
+  address: '428 Riverfront Place, Suite 100, Portland, OR 97201',
+  phone: '(503) 555-0192',
+  email: 'hello@riversidebooks.com',
+};
+
+async function initStoreHours() {
+  const list = document.getElementById('store-hours-list');
+  const contact = document.getElementById('store-contact');
+  if (!list && !contact) return;
+
+  let info = STORE_INFO_FALLBACK;
+  try {
+    const fetched = await InventoryAPI.getStoreInfo();
+    if (fetched) info = { ...STORE_INFO_FALLBACK, ...fetched };
+  } catch (err) {
+    console.warn('Could not load store info, using fallback:', err);
+  }
+
+  if (list) {
+    const parts = (info.hours || '').replace(/\.\s*$/, '').split(';').map((s) => s.trim()).filter(Boolean);
+    list.innerHTML = parts.map((part) => {
+      const i = part.indexOf(':');
+      return i === -1
+        ? `<li>${part}</li>`
+        : `<li><strong>${part.slice(0, i)}:</strong> ${part.slice(i + 1).trim()}</li>`;
+    }).join('');
+  }
+
+  if (contact) {
+    const phoneDigits = (info.phone || '').replace(/[^\d+]/g, '');
+    contact.innerHTML = [
+      info.address ? `<span>${info.address}</span>` : '',
+      info.phone ? `<a href="tel:${phoneDigits}" style="color: inherit;">${info.phone}</a>` : '',
+      info.email ? `<a href="mailto:${info.email}" style="color: inherit;">${info.email}</a>` : '',
+    ].filter(Boolean).join('<br>');
+  }
+}
 
 /* ----------------------------------------------------
    DEMO — Prefill: load a real Supabase customer into the account modal

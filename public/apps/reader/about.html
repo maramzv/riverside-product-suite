@@ -9,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <link rel="stylesheet" href="styles/main.css">
@@ -86,15 +86,16 @@
           </p>
         </div>
         <div style="background: #f7f5f0; padding: 2rem; border-radius: var(--border-radius-sm); border: 1px solid #e2e8f0;">
-          <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--primary-green);">Store Hours & Location</h3>
-          <ul style="list-style: none; padding: 0; line-height: 2; color: #4a5568;">
-            <li><strong>Monday – Friday:</strong> 9:00 AM – 7:00 PM</li>
-            <li><strong>Saturday:</strong> 10:00 AM – 6:00 PM</li>
-            <li><strong>Sunday:</strong> 11:00 AM – 5:00 PM</li>
+          <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--primary-green);">Store Information</h3>
+          <ul id="store-hours-list" style="list-style: none; padding: 0; line-height: 2; color: #4a5568;">
+            <li>Loading hours…</li>
           </ul>
-          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #cbd5e0; display: flex; align-items: flex-start; gap: 0.5rem;">
+          <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 1.25rem;">
             <svg style="width: 18px; height: 18px; stroke: var(--primary-green); fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; margin-top: 2px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <p style="font-size: 0.9rem; color: #718096; margin: 0;">Conveniently located right in the neighborhood. Order online for quick in-store pickup!</p>
+            <p id="store-contact" style="font-size: 0.9rem; color: #718096; margin: 0; line-height: 1.6;">Loading location…</p>
+          </div>
+          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #cbd5e0;">
+            <p style="font-size: 0.9rem; color: #718096; margin: 0; line-height: 1.6;">Conveniently located right in the neighborhood. Pre-order online for quick in-store pickup!</p>
           </div>
         </div>
       </div>
