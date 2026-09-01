@@ -43,6 +43,11 @@ const postNowBtn = document.getElementById("post-now-btn");
 const scheduleToggleBtn = document.getElementById("schedule-toggle-btn");
 const schedulePanel = document.getElementById("schedule-panel");
 const postDateInput = document.getElementById("post-date");
+const timePills = document.getElementById("time-pills");
+const customTime = document.getElementById("custom-time");
+const ctHour = document.getElementById("ct-hour");
+const ctMinute = document.getElementById("ct-minute");
+const ctAmpm = document.getElementById("ct-ampm");
 const confirmScheduleBtn = document.getElementById("confirm-schedule-btn");
 const toast = document.getElementById("toast");
 
@@ -492,6 +497,30 @@ function todayStr() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
+function nowTimeStr() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
+// The scheduled time = the selected time pill, or the hour/minute/AM-PM controls
+// when "Custom…" is picked. Returns 24-hour "HH:MM".
+function getScheduledTime() {
+  const v = selectedPillValue(timePills) || "12:00";
+  if (v !== "custom") return v;
+  let h = (parseInt(ctHour.value, 10) || 12) % 12;
+  if ((selectedPillValue(ctAmpm) || "PM") === "PM") h += 12;
+  return `${String(h).padStart(2, "0")}:${ctMinute.value || "00"}`;
+}
+
+// "14:30" -> "2:30 PM"
+function formatTime(hhmm) {
+  if (!hhmm) return "";
+  const [h, m] = String(hhmm).split(":").map(Number);
+  if (Number.isNaN(h)) return hhmm;
+  const period = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(m || 0).padStart(2, "0")} ${period}`;
+}
+
 function ordinalSuffix(day) {
   const j = day % 10;
   const k = day % 100;
@@ -920,6 +949,7 @@ async function publishPost(mode) {
   const captionWithTags = hashtags ? `${caption}\n\n${hashtags}` : caption;
   const platform = selectedPillValue(platformPills) || "Instagram";
   const postDate = mode === "now" ? todayStr() : postDateInput.value || todayStr();
+  const postTime = mode === "now" ? nowTimeStr() : getScheduledTime();
 
   const triggerBtn = mode === "now" ? postNowBtn : confirmScheduleBtn;
   const triggerLabel = triggerBtn.textContent;
@@ -932,6 +962,7 @@ async function publishPost(mode) {
   const row = {
     post_id: generatePostId(),
     post_date: postDate,
+    post_time: postTime,
     platform,
     related_type: type,
     book_id: type === "Book" ? selectedItem.book_id : null,
@@ -976,7 +1007,8 @@ function buildRow(post, cells) {
 }
 
 function postMetaCell(post) {
-  return `<td class="post-meta-cell"><div class="post-meta-inner"><span class="meta-date">${formatDate(post.post_date)}</span><span class="platform-badge">${post.platform}</span></div></td>`;
+  const when = post.post_time ? `${formatDate(post.post_date)} &middot; ${formatTime(post.post_time)}` : formatDate(post.post_date);
+  return `<td class="post-meta-cell"><div class="post-meta-inner"><span class="meta-date">${when}</span><span class="platform-badge">${post.platform}</span></div></td>`;
 }
 
 function captionCell(caption) {
@@ -1026,10 +1058,12 @@ function renderCalendar() {
     const isToday = dateStr === today;
 
     const chips = posts
+      .slice()
+      .sort((a, b) => (a.post_time || "00:00").localeCompare(b.post_time || "00:00"))
       .slice(0, MAX_CHIPS_PER_DAY)
       .map(
         (post) =>
-          `<div class="calendar-chip" title="${post.platform}: ${itemLabelFor(post)}">
+          `<div class="calendar-chip" title="${post.post_time ? formatTime(post.post_time) + " — " : ""}${post.platform}: ${itemLabelFor(post)}">
             <span class="platform-badge">${post.platform}</span> ${itemLabelFor(post)}
           </div>`
       )
@@ -1051,7 +1085,7 @@ function renderCalendar() {
 async function loadHistory() {
   const { data, error } = await supabase
     .from("Social Posts")
-    .select("post_id, post_date, platform, related_type, book_id, event_id, caption_text")
+    .select("post_id, post_date, post_time, platform, related_type, book_id, event_id, caption_text")
     .order("post_date", { ascending: false })
     .order("post_id", { ascending: false });
 
@@ -1066,8 +1100,9 @@ async function loadHistory() {
   renderCalendar();
 
   const today = todayStr();
-  const upcoming = data.filter((p) => p.post_date >= today).sort((a, b) => a.post_date.localeCompare(b.post_date));
-  const published = data.filter((p) => p.post_date < today).sort((a, b) => b.post_date.localeCompare(a.post_date));
+  const stamp = (p) => `${p.post_date} ${p.post_time || "00:00"}`;
+  const upcoming = data.filter((p) => p.post_date >= today).sort((a, b) => stamp(a).localeCompare(stamp(b)));
+  const published = data.filter((p) => p.post_date < today).sort((a, b) => stamp(b).localeCompare(stamp(a)));
 
   upcomingCount.textContent = `(${upcoming.length})`;
   publishedCount.textContent = `(${published.length})`;
@@ -1222,6 +1257,21 @@ calendarNextBtn.addEventListener("click", () => {
 
 postDateInput.value = todayStr();
 postDateInput.min = todayStr();
+
+// Custom time control: 1–12 hour, 5-minute steps, AM/PM toggle — all app-styled.
+for (let h = 1; h <= 12; h++) ctHour.add(new Option(String(h), String(h)));
+for (let m = 0; m < 60; m += 5) {
+  const v = String(m).padStart(2, "0");
+  ctMinute.add(new Option(v, v));
+}
+ctHour.value = "12";
+ctMinute.value = "00";
+setupPillGroup(ctAmpm, () => {});
+
+// Time pills: reveal the custom control only when "Custom…" is chosen.
+setupPillGroup(timePills, (value) => {
+  customTime.classList.toggle("hidden", value !== "custom");
+});
 
 // Bind composer refs synchronously so resetComposer()/enableComposer() never race
 // against the async loadPlatforms() call that would otherwise bind them first.

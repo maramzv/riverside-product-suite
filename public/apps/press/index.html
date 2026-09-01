@@ -137,11 +137,33 @@
         <button id="schedule-toggle-btn" type="button" disabled>Schedule for later</button>
       </div>
       <div class="tone-panel hidden" id="schedule-panel">
-        <p class="tone-panel-label">Pick a date to schedule:</p>
-        <div class="row">
-          <input type="date" id="post-date" />
-          <button id="confirm-schedule-btn" type="button">Confirm schedule</button>
+        <p class="tone-panel-label">Pick a date and time to schedule:</p>
+        <div class="schedule-fields">
+          <label class="schedule-field">
+            <span class="pill-field-label">Date</span>
+            <input type="date" id="post-date" />
+          </label>
+          <div class="schedule-field">
+            <span class="pill-field-label">Time</span>
+            <div class="pill-group" id="time-pills">
+              <button type="button" class="pill" data-value="09:00">9:00 AM</button>
+              <button type="button" class="pill selected" data-value="12:00">12:00 PM</button>
+              <button type="button" class="pill" data-value="15:00">3:00 PM</button>
+              <button type="button" class="pill" data-value="18:00">6:00 PM</button>
+              <button type="button" class="pill" data-value="custom">Custom&hellip;</button>
+            </div>
+            <div class="custom-time hidden" id="custom-time">
+              <select id="ct-hour" aria-label="Hour"></select>
+              <span class="custom-time-colon">:</span>
+              <select id="ct-minute" aria-label="Minute"></select>
+              <div class="pill-group" id="ct-ampm">
+                <button type="button" class="pill" data-value="AM">AM</button>
+                <button type="button" class="pill selected" data-value="PM">PM</button>
+              </div>
+            </div>
+          </div>
         </div>
+        <button id="confirm-schedule-btn" type="button">Confirm schedule</button>
       </div>
     </section>
 
